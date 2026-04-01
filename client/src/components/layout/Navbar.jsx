@@ -1,0 +1,292 @@
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Bell, Menu } from "lucide-react";
+
+import { api } from "../../api/axiosConfig";
+import { useAuth } from "../../context/AuthContext.jsx";
+
+const navLinks = [
+  { to: "/browse", label: "Browse Items" },
+  { to: "/add-item", label: "List an Item" },
+];
+
+const Navbar = () => {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [latestNotifications, setLatestNotifications] = useState([]);
+  const [notifOpen, setNotifOpen] = useState(false);
+
+  const isAuthed = Boolean(user?.id);
+  const canFetchNotifications = isAuthed && Boolean(localStorage.getItem("token"));
+
+  useEffect(() => {
+    if (!canFetchNotifications) return;
+
+    const run = async () => {
+      try {
+        const res = await api.get("/notifications/unread-count");
+        setUnreadCount(res?.data?.count ?? 0);
+      } catch {
+        // ignore
+      }
+
+      try {
+        const res = await api.get("/notifications");
+        const notifications = res?.data?.notifications;
+        setLatestNotifications(
+          Array.isArray(notifications) ? notifications.slice(0, 5) : []
+        );
+      } catch {
+        // ignore
+      }
+    };
+
+    run();
+  }, [canFetchNotifications]);
+
+  const handleLogout = () => {
+    setNotifOpen(false);
+    setMobileOpen(false);
+    logout();
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await api.put("/notifications/read-all");
+      setUnreadCount(0);
+      setNotifOpen(false);
+    } catch {
+      // ignore
+    }
+  };
+
+  const userAvatar = useMemo(() => user?.avatar || "", [user?.avatar]);
+
+  return (
+    <header className="bg-[#0f172a]/90 backdrop-blur-md sticky top-0 z-50 border-b border-white/10">
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/"
+            className="font-extrabold tracking-wide text-white"
+            onClick={() => setMobileOpen(false)}
+          >
+            UniBorrow
+          </Link>
+        </div>
+
+        <nav className="hidden md:flex items-center gap-6">
+          {navLinks.map((l) => (
+            <Link
+              key={l.to}
+              to={l.to}
+              className="text-white/80 hover:text-white transition-colors"
+              onClick={() => setMobileOpen(false)}
+            >
+              {l.label}
+            </Link>
+          ))}
+          {isAuthed && (
+            <Link
+              to="/dashboard"
+              className="text-white/80 hover:text-white transition-colors"
+            >
+              Dashboard
+            </Link>
+          )}
+        </nav>
+
+        <div className="flex items-center gap-3">
+          {isAuthed ? (
+            <>
+              <div className="relative">
+                <button
+                  type="button"
+                  className="text-white/80 hover:text-white"
+                  onClick={() => setNotifOpen((v) => !v)}
+                  aria-label="Notifications"
+                >
+                  <Bell className="w-5 h-5" />
+                </button>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-[#f97316] text-white text-xs font-bold rounded-full px-2 py-0.5">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+
+                {notifOpen && (
+                  <div className="absolute right-0 mt-3 w-[340px] bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <p className="font-semibold text-[#0f172a]">Notifications</p>
+                      <button
+                        type="button"
+                        onClick={handleMarkAllRead}
+                        className="text-[#f97316] font-semibold"
+                      >
+                        Mark all read
+                      </button>
+                    </div>
+
+                    <div className="mt-3 space-y-3 max-h-[320px] overflow-auto">
+                      {latestNotifications.length === 0 ? (
+                        <div className="text-[#64748b] text-sm">
+                          No notifications yet.
+                        </div>
+                      ) : (
+                        latestNotifications.map((n) => (
+                          <button
+                            type="button"
+                            key={n._id}
+                            className="w-full text-left"
+                            onClick={() => {
+                              setNotifOpen(false);
+                              navigate("/notifications");
+                            }}
+                          >
+                            <div
+                              className={
+                                "p-3 rounded-xl border " +
+                                (!n.read
+                                  ? "border-[#f97316]/50"
+                                  : "border-white/40")
+                              }
+                            >
+                              <div className="text-sm font-semibold text-[#0f172a]">
+                                {n.type.replaceAll("_", " ")}
+                              </div>
+                              <div className="text-sm text-[#64748b] mt-1">
+                                {n.message}
+                              </div>
+                              <div className="text-xs text-[#64748b] mt-2">
+                                {n.createdAt ? new Date(n.createdAt).toLocaleString() : ""}
+                              </div>
+                            </div>
+                          </button>
+                        ))
+                      )}
+                    </div>
+
+                    <div className="mt-3">
+                      <button
+                        type="button"
+                        className="text-[#f97316] font-semibold"
+                        onClick={() => {
+                          setNotifOpen(false);
+                          navigate("/notifications");
+                        }}
+                      >
+                        View all
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="button"
+                className="flex items-center gap-2"
+                onClick={() => navigate("/dashboard")}
+              >
+                <img
+                  src={userAvatar || "https://via.placeholder.com/40"}
+                  alt="User avatar"
+                  className="w-9 h-9 rounded-full object-cover border border-white/20"
+                />
+              </button>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="text-white/80 hover:text-white font-semibold"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="text-white/80 hover:text-white font-semibold"
+              >
+                Login
+              </Link>
+              <Link
+                to="/signup"
+                className="bg-[#f97316] hover:bg-[#ea6c0a] text-white font-semibold rounded-xl px-4 py-2 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25"
+              >
+                Sign up
+              </Link>
+            </>
+          )}
+        </div>
+
+        <button
+          type="button"
+          className="md:hidden text-white/80 hover:text-white"
+          onClick={() => setMobileOpen((v) => !v)}
+          aria-label="Open menu"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+      </div>
+
+      {mobileOpen && (
+        <div className="md:hidden px-4 pb-4">
+          <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl p-4 space-y-3">
+            {navLinks.map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                className="block text-[#0f172a] font-semibold"
+                onClick={() => setMobileOpen(false)}
+              >
+                {l.label}
+              </Link>
+            ))}
+            {isAuthed ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  className="block text-[#0f172a] font-semibold"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <button
+                  type="button"
+                  className="block text-[#f97316] font-semibold w-full text-left"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="block text-[#0f172a] font-semibold"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="block bg-[#f97316] hover:bg-[#ea6c0a] text-white font-semibold rounded-xl px-4 py-2 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25 text-center"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </header>
+  );
+};
+
+export default Navbar;
+

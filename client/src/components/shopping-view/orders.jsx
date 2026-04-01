@@ -67,7 +67,7 @@ function ShoppingOrders() {
                           orderItem?.orderStatus === "delivered"
                             ? "bg-green-600"
                             : orderItem?.orderStatus === "inShipping"
-                            ? "bg-blue-600"
+                            ? "bg-orange-600"
                             : orderItem?.orderStatus === "inProcess"
                             ? "bg-amber-600"
                             : orderItem?.orderStatus === "rejected" ||

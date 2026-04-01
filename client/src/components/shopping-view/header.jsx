@@ -60,7 +60,7 @@ function MenuItems() {
             "bg-white hover:bg-accent/40",
             menuItem.id === "home" && "border-transparent bg-gradient-to-r from-primary/15 to-accent/20",
             menuItem.id === "products" && "border-transparent bg-gradient-to-r from-secondary/70 to-accent/20",
-            menuItem.id === "men" && "border-transparent bg-gradient-to-r from-blue-50 to-white",
+            menuItem.id === "men" && "border-transparent bg-gradient-to-r from-orange-50 to-white",
             menuItem.id === "women" && "border-transparent bg-gradient-to-r from-pink-50 to-white",
             menuItem.id === "kids" && "border-transparent bg-gradient-to-r from-green-50 to-white",
             menuItem.id === "footwear" && "border-transparent bg-gradient-to-r from-amber-50 to-white",

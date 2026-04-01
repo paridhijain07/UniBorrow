@@ -72,7 +72,7 @@ function AdminOrderDetailsView({ orderDetails }) {
                   orderDetails?.orderStatus === "delivered"
                     ? "bg-green-600"
                     : orderDetails?.orderStatus === "inShipping"
-                    ? "bg-blue-600"
+                    ? "bg-orange-600"
                     : orderDetails?.orderStatus === "inProcess"
                     ? "bg-amber-600"
                     : orderDetails?.orderStatus === "rejected" ||

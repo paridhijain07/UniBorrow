@@ -1,12 +1,24 @@
-require("dotenv").config(); // Load env vars
+const dotenv=require("dotenv") // Load env vars
+dotenv.config();
+
+console.log("👉 ENV:", process.env);
 
 const express = require("express");
-const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const path=require("path");
 
+const connectDB = require("./config/dbs.cjs");
+const errorHandler = require("./middleware/errorHandler");
+
 const authRouter = require("./routes/auth/auth-routes");
+const itemsRouter = require("./routes/items/items-routes");
+const bookingsRouter = require("./routes/bookings/bookings-routes");
+const messagesRouter = require("./routes/messages/messages-routes");
+const reviewsRouter = require("./routes/reviews/reviews-routes");
+const notificationsRouter = require("./routes/notifications/notifications-routes");
+const usersRouter = require("./routes/users/users-routes");
+const statsRouter = require("./routes/stats/stats-routes");
 const adminProductsRouter = require("./routes/admin/products-routes");
 const shopProductsRouter = require("./routes/shop/products-routes");
 const shopCartRouter = require("./routes/shop/cart-routes");
@@ -26,10 +38,11 @@ const allowedOrigins = (process.env.CORS_ORIGINS || process.env.CLIENT_URL || ""
   .filter(Boolean);
 
 // Connect to MongoDB
-mongoose
-  .connect(process.env.MONGO_URL)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+connectDB().catch((err) => {
+  console.error("❌ MongoDB connection error:", err);
+  process.exit(1);
+});
+
 
 // CORS middleware
 app.use(
@@ -66,6 +79,13 @@ app.get("/api", (req, res) => {
 
 // Routes
 app.use("/api/auth", authRouter);
+app.use("/api/items", itemsRouter);
+app.use("/api/bookings", bookingsRouter);
+app.use("/api/messages", messagesRouter);
+app.use("/api/reviews", reviewsRouter);
+app.use("/api/notifications", notificationsRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/stats", statsRouter);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/admin/orders", adminOrderRouter);
 
@@ -86,7 +106,11 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
+// Must be last.
+app.use(errorHandler);
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
+  console.log("ENV CHECK:", process.env.MONGO_URI);
 });

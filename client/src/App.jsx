@@ -1,115 +1,51 @@
 import { Route, Routes } from "react-router-dom";
-import AuthLayout from "./components/auth/layout";
-import AuthLogin from "./pages/auth/login";
-import AuthRegister from "./pages/auth/register";
-import AdminLayout from "./components/admin-view/layout";
-import AdminDashboard from "./pages/admin-view/dashboard";
-import AdminProducts from "./pages/admin-view/products";
-import AdminOrders from "./pages/admin-view/orders";
-import AdminFeatures from "./pages/admin-view/features";
-import ShoppingLayout from "./components/shopping-view/layout";
-import NotFound from "./pages/not-found";
-import ShoppingHome from "./pages/shopping-view/home";
-import ShoppingListing from "./pages/shopping-view/listing";
-import ShoppingCheckout from "./pages/shopping-view/checkout";
-import ShoppingAccount from "./pages/shopping-view/account";
-import CheckAuth from "./components/common/check-auth";
-import UnauthPage from "./pages/unauth-page";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
-import { checkAuth } from "./store/auth-slice";
-import { ToastContainer } from 'react-toastify';
 
-import PaypalReturnPage from "./pages/shopping-view/paypal-return.jsx";
-import PaypalCancelPage from "./pages/shopping-view/paypal-cancel.jsx";
-import PaymentSuccessPage from "./pages/shopping-view/payment-success";
-import SearchProducts from "./pages/shopping-view/search";
-import AiChatAssistant from "./components/shopping-view/AiChatAssistant";
+import PrivateRoute from "./components/PrivateRoute.jsx";
+import AppLayout from "./components/layout/AppLayout.jsx";
 
-function App() {
-  const { user, isAuthenticated, isLoading } = useSelector(
-    (state) => state.auth
-  );
-  const dispatch = useDispatch();
+import Home from "./pages/Home.jsx";
+import Browse from "./pages/Browse.jsx";
+import ItemDetail from "./pages/ItemDetail.jsx";
+import AddItem from "./pages/AddItem.jsx";
+import EditItem from "./pages/EditItem.jsx";
+import Bookings from "./pages/Bookings.jsx";
+import ChatList from "./pages/ChatList.jsx";
+import ChatThread from "./pages/ChatThread.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import Notifications from "./pages/Notifications.jsx";
+import Profile from "./pages/Profile.jsx";
+import Login from "./pages/Login.jsx";
+import Signup from "./pages/Signup.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
-  useEffect(() => {
-    dispatch(checkAuth());
-  }, [dispatch]);
-
-  if (isLoading) return <Skeleton className="w-[800] bg-black h-[600px]" />;
-
-
-  console.log(isLoading, user);
-
+const App = () => {
   return (
-    <div className="flex flex-col overflow-hidden bg-white">
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <CheckAuth
-              isAuthenticated={isAuthenticated}
-              user={user}
-            ></CheckAuth>
-          }
-        />
-        <Route
-          path="/auth"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <AuthLayout />
-            </CheckAuth>
-          }
-        >
-          <Route path="login" element={<AuthLogin />} />
-          <Route path="register" element={<AuthRegister />} />
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/browse" element={<Browse />} />
+        <Route path="/item/:id" element={<ItemDetail />} />
+
+        <Route element={<PrivateRoute />}>
+          <Route path="/add-item" element={<AddItem />} />
+          <Route path="/edit-item/:id" element={<EditItem />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/bookings" element={<Bookings />} />
+          <Route path="/chat" element={<ChatList />} />
+          <Route path="/chat/:userId" element={<ChatThread />} />
+          <Route path="/notifications" element={<Notifications />} />
         </Route>
-        <Route
-          path="/admin"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <AdminLayout />
-            </CheckAuth>
-          }
-        >
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="products" element={<AdminProducts />} />
-          <Route path="orders" element={<AdminOrders />} />
-          <Route path="features" element={<AdminFeatures />} />
-        </Route>
-        <Route
-          path="/shop"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <ShoppingLayout />
-            </CheckAuth>
-          }
-        >
-          <Route path="home" element={<ShoppingHome />} />
-          <Route path="listing" element={<ShoppingListing />} />
-          <Route path="checkout" element={<ShoppingCheckout />} />
-          <Route path="account" element={<ShoppingAccount />} />
-          <Route path="paypal-return" element={<PaypalReturnPage />} />
-          <Route path="paypal-cancel" element={<PaypalCancelPage />} />
-          <Route path="payment-success" element={<PaymentSuccessPage />} />
-          <Route path="search" element={<SearchProducts />} />
-        </Route>
-        <Route path="/unauth-page" element={<UnauthPage />} />
+
+        <Route path="/profile/:id" element={<Profile />} />
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
         <Route path="*" element={<NotFound />} />
-      </Routes>
-      <ToastContainer
-        position="bottom-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnHover
-        draggable
-      />
-      <AiChatAssistant />
-    </div>
+      </Route>
+    </Routes>
   );
-}
+};
 
 export default App;
+
