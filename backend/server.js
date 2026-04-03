@@ -1,7 +1,7 @@
 const dotenv=require("dotenv") // Load env vars
 dotenv.config();
 
-console.log("👉 ENV:", process.env);
+// console.log("👉 ENV:", process.env);
 
 const express = require("express");
 const cookieParser = require("cookie-parser");
@@ -112,5 +112,5 @@ app.use(errorHandler);
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
-  console.log("ENV CHECK:", process.env.MONGO_URI);
+  // console.log("ENV CHECK:", process.env.MONGO_URI);
 });
