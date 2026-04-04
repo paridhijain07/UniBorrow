@@ -62,7 +62,8 @@ const sendMessage = async (req, res, next) => {
 // GET /api/messages/conversations
 const getConversations = async (req, res, next) => {
   try {
-    const meId = req.user?.id;
+    const meId = new mongoose.Types.ObjectId(req.user?.id);
+
     if (!meId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
@@ -75,10 +76,14 @@ const getConversations = async (req, res, next) => {
       },
       {
         $addFields: {
-          otherUser: {
-            $cond: [{ $eq: ["$sender", meId] }, "$receiver", "$sender"],
-          },
-        },
+    otherUser: {
+      $cond: [
+        { $eq: ["$sender", meId] },
+        "$receiver",
+        "$sender"
+      ]
+    }
+  }
       },
       { $sort: { timestamp: -1 } },
       {
