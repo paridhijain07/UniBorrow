@@ -42,8 +42,12 @@ const getItems = async (req, res, next) => {
 
     const filters = {};
 
-    // Default to available items for the browse experience.
-    filters.status = status || "available";
+    // // Default to available items for the browse experience.
+    // filters.status = status || "available";
+
+    if (status) {
+  filters.status = status;
+}
 
     if (pickupLocation) filters.pickupLocation = pickupLocation;
     if (listingType) filters.listingType = listingType;

@@ -11,6 +11,7 @@ import AvailabilityCalendar from "../components/uniborrow/AvailabilityCalendar.j
 import BookingModal from "../components/uniborrow/BookingModal.jsx";
 import ReviewForm from "../components/uniborrow/ReviewForm.jsx";
 import ReviewCard from "../components/uniborrow/ReviewCard.jsx";
+import { getItemBookings } from "../api/bookings.api";
 
 const ItemDetail = () => {
   const navigate = useNavigate();
@@ -86,14 +87,36 @@ const ItemDetail = () => {
     return `Listed ${days} day(s) ago`;
   }, [item]);
 
-  const approvedBookings = item?.approvedBookings ?? [];
+  // const approvedBookings = item?.approvedBookings ?? [];
+ 
 
-  const bookedRanges = useMemo(() => {
-    return approvedBookings.map((b) => ({
-      startDate: b.startDate,
-      endDate: b.endDate,
+const [bookings, setBookings] = useState([]);
+
+useEffect(() => {
+  const fetchBookings = async () => {
+    try {
+      const res = await getItemBookings(id);
+      console.log("BOOKINGS API:", res); // 👈 ADD THIS
+      setBookings(res.bookings || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchBookings();
+}, [id]);
+
+const bookedRanges = useMemo(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return bookings
+    .filter((b) => new Date(b.endDate) >= today)
+    .map((b) => ({
+      startDate: new Date(b.startDate),
+      endDate: new Date(b.endDate),
     }));
-  }, [approvedBookings]);
+}, [bookings]);
 
   const images = item?.item?.images ?? [];
   const [activeImgIdx, setActiveImgIdx] = useState(0);

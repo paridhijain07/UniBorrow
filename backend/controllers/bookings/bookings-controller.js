@@ -276,7 +276,43 @@ const returnBooking = async (req, res, next) => {
     return next(err);
   }
 };
+// const getItemBookings = async (req, res) => {
+//   try {
+//     const { itemId } = req.params;
 
+//     const today = new Date();
+//     today.setHours(0, 0, 0, 0); // normalize
+
+//     const bookings = await Booking.find({
+//       item: itemId,
+//       status: { $in: ["pending", "approved"] }, // ✅ only active
+//       endDate: { $gte: today }, // ✅ only current/future
+//     }).select("startDate endDate status");
+
+//     res.json({ bookings });
+//   } catch (err) {
+//     res.status(500).json({ message: "Error fetching bookings" });
+//   }
+// };
+
+const getItemBookings = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const bookings = await Booking.find({
+      item: new mongoose.Types.ObjectId(itemId), // 🔥 IMPORTANT
+      status: { $in: ["pending", "approved"] },
+      endDate: { $gte: today },
+    }).select("startDate endDate status");
+
+    res.json({ bookings });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching bookings" });
+  }
+};
 module.exports = {
   createBooking,
   getMyRequests,
@@ -285,5 +321,6 @@ module.exports = {
   approveBooking,
   rejectBooking,
   returnBooking,
+  getItemBookings,
 };
 

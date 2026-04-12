@@ -15,6 +15,7 @@ const {
   approveBooking,
   rejectBooking,
   returnBooking,
+  getItemBookings
 } = require("../../controllers/bookings/bookings-controller");
 
 const router = express.Router();
@@ -49,6 +50,7 @@ router.put(
   validateRequest,
   returnBooking
 );
+router.get("/item/:itemId", auth, getItemBookings);
 
 module.exports = router;
 

@@ -30,4 +30,8 @@ export const returnBooking = async (id) => {
   const res = await api.put(`/bookings/${id}/return`);
   return res.data;
 };
+export const getItemBookings = async (itemId) => {
+  const res = await api.get(`/bookings/item/${itemId}`);
+  return res.data;
+};
 
