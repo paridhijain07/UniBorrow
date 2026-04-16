@@ -4,6 +4,7 @@ const Message = require("../../models/Message");
 const Notification = require("../../models/Notification");
 const Item = require("../../models/Item");
 const User = require("../../models/User");
+const { getIo, getOnlineUsers } = require("../../socket/chatSocket");
 
 const createNotification = async ({
   userId,
@@ -44,6 +45,15 @@ const sendMessage = async (req, res, next) => {
     if (itemId) {
       const item = await Item.findById(itemId).select("title");
       itemTitle = item?.title ? ` about "${item.title}"` : "";
+    }
+
+    const io = getIo();
+    const onlineUsers = getOnlineUsers();
+    if (io && onlineUsers) {
+      const receiverSocketId = onlineUsers.get(String(receiverId));
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("receive_private_message", message);
+      }
     }
 
     await createNotification({

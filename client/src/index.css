@@ -127,3 +127,27 @@
 .search-input-glow:focus {
   box-shadow: 0 0 0 2px oklch(0.45 0.18 25 / 0.3);
 }
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: scroll 30s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes page-fade {
+  0% { opacity: 0; transform: translateY(15px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-page-fade {
+  animation: page-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

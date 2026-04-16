@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Bell, Menu } from "lucide-react";
+import { Bell, Menu, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
 import { api } from "../../api/axiosConfig";
 import { useAuth } from "../../context/AuthContext.jsx";
@@ -13,7 +14,9 @@ const navLinks = [
 const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
 
+  const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [latestNotifications, setLatestNotifications] = useState([]);
@@ -21,6 +24,10 @@ const Navbar = () => {
 
   const isAuthed = Boolean(user?.id);
   const canFetchNotifications = isAuthed && Boolean(localStorage.getItem("token"));
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!canFetchNotifications) return;
@@ -63,7 +70,15 @@ const Navbar = () => {
     }
   };
 
-  const userAvatar = useMemo(() => user?.avatar || "", [user?.avatar]);
+  const userAvatar = useMemo(() => {
+    if (!user?.avatar) return "/default-avatar.svg";
+    let avatarUrl = user.avatar;
+    if (!avatarUrl.startsWith("http") && !avatarUrl.startsWith("data:") && !avatarUrl.startsWith("/")) {
+      const baseUrl = import.meta.env.VITE_API_URL.replace("/api", "");
+      avatarUrl = `${baseUrl}${avatarUrl}`;
+    }
+    return avatarUrl;
+  }, [user?.avatar]);
 
   return (
     <header className="bg-[#0f172a]/90 backdrop-blur-md sticky top-0 z-50 border-b border-white/10">
@@ -100,6 +115,15 @@ const Navbar = () => {
         </nav>
 
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="text-white/80 hover:text-white p-1 flex items-center justify-center mr-1 transition-all duration-200 hover:rotate-12"
+            aria-label="Toggle Dark Mode"
+          >
+            {mounted && (theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />)}
+          </button>
+          
           {isAuthed ? (
             <>
               <div className="relative">
@@ -118,9 +142,9 @@ const Navbar = () => {
                 )}
 
                 {notifOpen && (
-                  <div className="absolute right-0 mt-3 w-[340px] bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-lg p-4">
+                  <div className="absolute right-0 mt-3 w-[340px] bg-white/80 dark:bg-[#18181b]/90 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-lg p-4 z-50">
                     <div className="flex items-center justify-between">
-                      <p className="font-semibold text-[#0f172a]">Notifications</p>
+                      <p className="font-semibold text-[#0f172a] dark:text-[#f4f4f5]">Notifications</p>
                       <button
                         type="button"
                         onClick={handleMarkAllRead}
@@ -132,7 +156,7 @@ const Navbar = () => {
 
                     <div className="mt-3 space-y-3 max-h-[320px] overflow-auto">
                       {latestNotifications.length === 0 ? (
-                        <div className="text-[#64748b] text-sm">
+                        <div className="text-[#64748b] dark:text-[#a1a1aa] text-sm">
                           No notifications yet.
                         </div>
                       ) : (
@@ -150,17 +174,17 @@ const Navbar = () => {
                               className={
                                 "p-3 rounded-xl border " +
                                 (!n.read
-                                  ? "border-[#f97316]/50"
-                                  : "border-white/40")
+                                  ? "border-[#f97316]/50 bg-orange-50/50 dark:bg-[#f97316]/10"
+                                  : "border-gray-200 dark:border-[#3f3f46] bg-white/60 dark:bg-[#1f1f22]/60")
                               }
                             >
-                              <div className="text-sm font-semibold text-[#0f172a]">
+                              <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
                                 {n.type.replaceAll("_", " ")}
                               </div>
-                              <div className="text-sm text-[#64748b] mt-1">
+                              <div className="text-sm text-[#64748b] dark:text-[#d4d4d8] mt-1">
                                 {n.message}
                               </div>
-                              <div className="text-xs text-[#64748b] mt-2">
+                              <div className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-2">
                                 {n.createdAt ? new Date(n.createdAt).toLocaleString() : ""}
                               </div>
                             </div>
@@ -191,7 +215,7 @@ const Navbar = () => {
                 onClick={() => navigate("/dashboard")}
               >
                 <img
-                  src={userAvatar || "https://via.placeholder.com/40"}
+                  src={userAvatar || "/default-avatar.svg"}
                   alt="User avatar"
                   className="w-9 h-9 rounded-full object-cover border border-white/20"
                 />

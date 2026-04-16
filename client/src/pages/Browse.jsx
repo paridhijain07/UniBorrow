@@ -30,9 +30,9 @@ const FeaturedItemCard = ({ it, onOpen }) => {
     <button
       type="button"
       onClick={onOpen}
-      className="text-left rounded-2xl bg-white/80 backdrop-blur-md border border-white/40 p-4 shadow-md hover:scale-[1.02] hover:shadow-xl transition-all duration-200"
+      className="text-left rounded-2xl bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] p-4 shadow-md hover:scale-[1.02] hover:shadow-xl hover:border-[#f97316]/50 hover:ring-2 hover:ring-[#f97316]/20 transition-all duration-200"
     >
-      <div className="aspect-square rounded-xl overflow-hidden bg-white/60 border border-white/40">
+      <div className="aspect-square rounded-xl overflow-hidden bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46]">
         {it.images?.[0] ? (
           <img
             src={it.images[0]}
@@ -40,7 +40,7 @@ const FeaturedItemCard = ({ it, onOpen }) => {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-[#64748b] text-sm">
+          <div className="w-full h-full flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] text-sm">
             No image
           </div>
         )}
@@ -57,30 +57,30 @@ const FeaturedItemCard = ({ it, onOpen }) => {
         >
           {it.listingType === "Rent" ? "Rent" : "Exchange"}
         </span>
-        <span className="px-2 py-1 rounded-full text-xs font-semibold bg-white/60 text-[#0f172a] border border-white/40">
+        <span className="px-2 py-1 rounded-full text-xs font-semibold bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] border border-white/40 dark:border-[#3f3f46]">
           {it.condition}
         </span>
       </div>
 
-      <div className="mt-3 font-extrabold text-[#0f172a] leading-tight">
+      <div className="mt-3 font-extrabold text-[#0f172a] dark:text-[#f4f4f5] leading-tight">
         {it.title}
       </div>
 
-      <div className="mt-2 text-sm text-[#64748b]">
+      <div className="mt-2 text-sm text-[#64748b] dark:text-[#a1a1aa]">
         {it.listingType === "Exchange" || it.price === 0 ? (
-          <span className="font-semibold text-[#0f172a]">Free Exchange</span>
+          <span className="font-semibold text-[#0f172a] dark:text-[#f4f4f5]">Free Exchange</span>
         ) : (
-          <span className="font-semibold text-[#0f172a]">
+          <span className="font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
             ₹{it.price}/day
           </span>
         )}
       </div>
       {it.originalPrice && it.originalPrice > 0 && (
-        <div className="text-xs text-[#64748b] mt-1">
+        <div className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-1">
           <span className="line-through">₹{it.originalPrice}</span>
         </div>
       )}
-      <div className="text-xs text-[#64748b] mt-2">
+      <div className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-2">
         Listed {it.createdAt ? Math.max(1, Math.floor((Date.now() - new Date(it.createdAt)) / 86400000)) : 0} day(s) ago
       </div>
     </button>
@@ -225,10 +225,10 @@ const Browse = () => {
   return (
     <div className="w-full">
       <section className="max-w-6xl mx-auto px-4 pt-6">
-        <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-md p-4 sticky top-[72px] z-10">
+        <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-4 sticky top-[72px] z-10">
           <div className="flex items-center gap-3">
             <input
-              className="flex-1 border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+              className="flex-1 border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
               placeholder="Search items, descriptions, tags..."
               value={query.search}
               onChange={(e) => setQuery((q) => ({ ...q, search: e.target.value, page: 1 }))}
@@ -236,7 +236,7 @@ const Browse = () => {
             <button
               type="button"
               onClick={clearAll}
-              className="bg-white/80 hover:bg-white text-[#0f172a] font-semibold rounded-xl px-4 py-2 border border-white/40"
+              className="bg-white dark:bg-[#1f1f22] hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/20 dark:hover:border-red-900/50 text-[#ef4444] font-semibold rounded-xl px-4 py-2 border border-gray-200 dark:border-[#3f3f46] shadow-sm hover:shadow-md transition-all duration-200"
             >
               Clear
             </button>
@@ -248,10 +248,10 @@ const Browse = () => {
                 <button
                   key={c.key}
                   type="button"
-                  className="bg-white/60 border border-white/40 rounded-full px-3 py-1 text-xs font-semibold text-[#0f172a] hover:bg-white/80 transition-colors"
+                  className="bg-white dark:bg-[#1f1f22] border border-gray-200 dark:border-[#3f3f46] shadow-sm hover:shadow-md hover:-translate-y-0.5 rounded-full px-4 py-1.5 text-xs font-semibold text-[#0f172a] dark:text-[#f4f4f5] hover:border-gray-300 dark:hover:border-gray-500 transition-all cursor-pointer flex items-center justify-center gap-1"
                   onClick={() => removeChip(c.key)}
                 >
-                  {c.label} ×
+                  {c.label} <span className="opacity-60 hover:opacity-100 font-bold ml-0.5">×</span>
                 </button>
               ))}
             </div>
@@ -260,16 +260,16 @@ const Browse = () => {
 
         <div className="mt-6 grid md:grid-cols-3 gap-5">
           <aside className="md:block hidden">
-            <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-md p-4">
-              <h3 className="font-extrabold text-[#0f172a]">Filters</h3>
+            <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-4">
+              <h3 className="font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">Filters</h3>
 
               <div className="mt-4 space-y-4">
                 <div>
-                  <div className="text-sm font-semibold text-[#0f172a] mb-2">
+                  <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5] mb-2">
                     Category
                   </div>
                   <select
-                    className="w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                    className="w-full border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
                     value={query.category}
                     onChange={(e) =>
                       setQuery((q) => ({
@@ -289,11 +289,11 @@ const Browse = () => {
                 </div>
 
                 <div>
-                  <div className="text-sm font-semibold text-[#0f172a] mb-2">
+                  <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5] mb-2">
                     Condition
                   </div>
                   <select
-                    className="w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                    className="w-full border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
                     value={query.condition}
                     onChange={(e) =>
                       setQuery((q) => ({
@@ -313,11 +313,11 @@ const Browse = () => {
                 </div>
 
                 <div>
-                  <div className="text-sm font-semibold text-[#0f172a] mb-2">
+                  <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5] mb-2">
                     Listing type
                   </div>
                   <select
-                    className="w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                    className="w-full border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
                     value={query.listingType}
                     onChange={(e) =>
                       setQuery((q) => ({
@@ -337,11 +337,11 @@ const Browse = () => {
                 </div>
 
                 <div>
-                  <div className="text-sm font-semibold text-[#0f172a] mb-2">
+                  <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5] mb-2">
                     Pickup location
                   </div>
                   <select
-                    className="w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                    className="w-full border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
                     value={query.pickupLocation}
                     onChange={(e) =>
                       setQuery((q) => ({
@@ -361,12 +361,12 @@ const Browse = () => {
                 </div>
 
                 <div>
-                  <div className="text-sm font-semibold text-[#0f172a] mb-2">
+                  <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5] mb-2">
                     Price range (per day)
                   </div>
                   <div className="flex gap-2">
                     <input
-                      className="w-1/2 border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                      className="w-1/2 border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
                       placeholder="Min"
                       value={query.minPrice}
                       onChange={(e) =>
@@ -374,7 +374,7 @@ const Browse = () => {
                       }
                     />
                     <input
-                      className="w-1/2 border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                      className="w-1/2 border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
                       placeholder="Max"
                       value={query.maxPrice}
                       onChange={(e) =>
@@ -385,11 +385,11 @@ const Browse = () => {
                 </div>
 
                 <div>
-                  <div className="text-sm font-semibold text-[#0f172a] mb-2">
+                  <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5] mb-2">
                     Sort
                   </div>
                   <select
-                    className="w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                    className="w-full border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
                     value={query.sort}
                     onChange={(e) =>
                       setQuery((q) => ({

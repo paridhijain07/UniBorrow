@@ -23,6 +23,7 @@ const BookingModal = ({
   pending,
   error,
   item,
+  bookedRanges = [],
 }) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -55,6 +56,13 @@ const BookingModal = ({
     const e = toDate(endDate);
     if (!s || !e) return "Please select valid dates";
     if (e.getTime() < s.getTime()) return "End date must be on or after start date";
+
+    for (const range of bookedRanges) {
+      if (s.getTime() <= range.endDate.getTime() && e.getTime() >= range.startDate.getTime()) {
+        return "Selected dates overlap with an existing booking.";
+      }
+    }
+
     return "";
   };
 

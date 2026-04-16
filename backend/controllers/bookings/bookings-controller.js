@@ -183,8 +183,6 @@ const approveBooking = async (req, res, next) => {
     booking.status = "approved";
     await booking.save();
 
-    // Mark the item as rented.
-    await Item.findByIdAndUpdate(booking.item._id, { status: "rented" });
 
     const borrower = await User.findById(booking.borrower);
     await createNotification({
@@ -219,8 +217,6 @@ const rejectBooking = async (req, res, next) => {
     booking.status = "rejected";
     await booking.save();
 
-    // For MVP: release the item availability.
-    await Item.findByIdAndUpdate(booking.item._id, { status: "available" });
 
     await createNotification({
       userId: booking.borrower,
@@ -255,8 +251,6 @@ const returnBooking = async (req, res, next) => {
     booking.reviewLeft = false;
     await booking.save();
 
-    // Mark item available again.
-    await Item.findByIdAndUpdate(booking.item._id, { status: "available" });
 
     await User.findByIdAndUpdate(booking.owner, { $inc: { totalLent: 1 } });
     await User.findByIdAndUpdate(booking.borrower, {

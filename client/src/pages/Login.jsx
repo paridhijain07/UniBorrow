@@ -41,8 +41,8 @@ const Login = () => {
 
   return (
     <div className="max-w-xl mx-auto px-4 py-10 w-full">
-      <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-md border border-white/40 p-6">
-        <h1 className="text-2xl font-extrabold text-[#0f172a]">
+      <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md rounded-2xl shadow-md border border-white/40 dark:border-[#27272a] p-6">
+        <h1 className="text-2xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">
           Login to UniBorrow
         </h1>
         <p className="text-sm text-[#64748b] mt-2">
@@ -51,11 +51,11 @@ const Login = () => {
 
         <form className="mt-6 space-y-4" onSubmit={onSubmit}>
           <div>
-            <label className="block text-sm font-semibold text-[#0f172a]">
+            <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
               Email
             </label>
             <input
-              className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+              className="mt-1 w-full border border-white/40 dark:border-[#27272a] bg-white/60 dark:bg-[#1f1f22]/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
@@ -68,11 +68,11 @@ const Login = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-[#0f172a]">
+            <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
               Password
             </label>
             <input
-              className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+              className="mt-1 w-full border border-white/40 dark:border-[#27272a] bg-white/60 dark:bg-[#1f1f22]/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Your password"

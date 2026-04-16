@@ -8,7 +8,7 @@ const User = require("../../models/User");
 
 const updateUserRatingFromReviews = async (targetUserId) => {
   const stats = await Review.aggregate([
-    { $match: { targetUser: mongoose.Types.ObjectId(targetUserId) } },
+    { $match: { targetUser: new mongoose.Types.ObjectId(targetUserId) } },
     {
       $group: {
         _id: null,

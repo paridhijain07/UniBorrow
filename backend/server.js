@@ -4,12 +4,15 @@ dotenv.config();
 // console.log("👉 ENV:", process.env);
 
 const express = require("express");
+const http = require("http");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const path=require("path");
 
 const connectDB = require("./config/dbs.cjs");
 const errorHandler = require("./middleware/errorHandler");
+const { startCron } = require("./cron/bookingCron");
+const { initSocket } = require("./socket/chatSocket");
 
 const authRouter = require("./routes/auth/auth-routes");
 const itemsRouter = require("./routes/items/items-routes");
@@ -30,6 +33,7 @@ const shopSearchRouter = require("./routes/shop/search-routes");
 const shopReviewRouter = require("./routes/shop/review-routes");
 
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 const _dirname=path.resolve();
 const allowedOrigins = (process.env.CORS_ORIGINS || process.env.CLIENT_URL || "")
@@ -38,7 +42,9 @@ const allowedOrigins = (process.env.CORS_ORIGINS || process.env.CLIENT_URL || ""
   .filter(Boolean);
 
 // Connect to MongoDB
-connectDB().catch((err) => {
+connectDB().then(() => {
+  startCron();
+}).catch((err) => {
   console.error("❌ MongoDB connection error:", err);
   process.exit(1);
 });
@@ -110,7 +116,8 @@ if (process.env.NODE_ENV === "production") {
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, () => {
+initSocket(server, allowedOrigins);
+server.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
   // console.log("ENV CHECK:", process.env.MONGO_URI);
 });

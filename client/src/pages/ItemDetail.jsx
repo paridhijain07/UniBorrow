@@ -165,12 +165,12 @@ const bookedRanges = useMemo(() => {
     return (
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="grid lg:grid-cols-2 gap-8">
-          <div className="rounded-2xl bg-white/60 border border-white/40 h-[420px] animate-pulse" />
+          <div className="rounded-2xl bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] h-[420px] animate-pulse" />
           <div className="space-y-4">
-            <div className="h-10 bg-white/60 border border-white/40 rounded-2xl animate-pulse" />
-            <div className="h-6 bg-white/60 border border-white/40 rounded-2xl animate-pulse" />
-            <div className="h-6 bg-white/60 border border-white/40 rounded-2xl animate-pulse" />
-            <div className="h-12 bg-white/60 border border-white/40 rounded-2xl animate-pulse" />
+            <div className="h-10 bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] rounded-2xl animate-pulse" />
+            <div className="h-6 bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] rounded-2xl animate-pulse" />
+            <div className="h-6 bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] rounded-2xl animate-pulse" />
+            <div className="h-12 bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] rounded-2xl animate-pulse" />
           </div>
         </div>
       </div>
@@ -180,7 +180,7 @@ const bookedRanges = useMemo(() => {
   if (itemError || !item) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-10">
-        <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl p-6 text-[#ef4444] font-semibold">
+        <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl p-6 text-[#ef4444] font-semibold">
           {itemError || "Item not found"}
         </div>
       </div>
@@ -193,8 +193,8 @@ const bookedRanges = useMemo(() => {
     <div className="max-w-6xl mx-auto px-4 py-10">
       <div className="grid lg:grid-cols-2 gap-8 items-start">
         <div className="space-y-4">
-          <div className="rounded-2xl bg-white/80 backdrop-blur-md border border-white/40 shadow-md p-3">
-            <div className="aspect-square rounded-2xl overflow-hidden bg-white/60 border border-white/40">
+          <div className="rounded-2xl bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] shadow-md p-3">
+            <div className="aspect-square rounded-2xl overflow-hidden bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46]">
               {images?.[activeImgIdx] ? (
                 <img
                   src={images[activeImgIdx]}
@@ -202,7 +202,7 @@ const bookedRanges = useMemo(() => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-[#64748b] font-semibold">
+                <div className="w-full h-full flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] font-semibold">
                   No image
                 </div>
               )}
@@ -218,7 +218,7 @@ const bookedRanges = useMemo(() => {
                       onClick={() => setActiveImgIdx(idx)}
                       className={
                         "w-16 h-16 rounded-xl overflow-hidden border transition-all duration-200 " +
-                        (active ? "border-[#f97316]" : "border-white/40")
+                        (active ? "border-[#f97316]" : "border-white/40 dark:border-[#3f3f46]")
                       }
                     >
                       <img
@@ -237,9 +237,9 @@ const bookedRanges = useMemo(() => {
         </div>
 
         <div className="space-y-5">
-          <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-md p-6">
+          <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6">
             <div className="flex flex-col gap-3">
-              <h1 className="text-3xl font-extrabold text-[#0f172a] leading-tight">
+              <h1 className="text-3xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5] leading-tight">
                 {currentItem?.title}
               </h1>
               <div className="flex flex-wrap gap-2">
@@ -255,14 +255,14 @@ const bookedRanges = useMemo(() => {
                     ? "Rent"
                     : "Exchange"}
                 </span>
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/60 text-[#0f172a] border border-white/40">
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] border border-white/40 dark:border-[#3f3f46]">
                   {currentItem?.condition}
                 </span>
               </div>
 
               <div>
-                <div className="text-sm text-[#64748b]">Price</div>
-                <div className="text-2xl font-extrabold text-[#0f172a] mt-1">
+                <div className="text-sm text-[#64748b] dark:text-[#a1a1aa]">Price</div>
+                <div className="text-2xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5] mt-1">
                   {currentItem?.listingType === "Exchange" || currentItem?.price === 0 ? (
                     <span>Free Exchange</span>
                   ) : (
@@ -270,7 +270,7 @@ const bookedRanges = useMemo(() => {
                       ₹{currentItem?.price}/day
                       {currentItem?.originalPrice &&
                         currentItem.originalPrice > 0 && (
-                          <span className="ml-3 text-sm text-[#64748b] line-through font-semibold">
+                          <span className="ml-3 text-sm text-[#64748b] dark:text-[#a1a1aa] line-through font-semibold">
                             ₹{currentItem.originalPrice}
                           </span>
                         )}
@@ -279,16 +279,16 @@ const bookedRanges = useMemo(() => {
                 </div>
               </div>
 
-              <div className="text-sm text-[#64748b] font-semibold">
+              <div className="text-sm text-[#64748b] dark:text-[#a1a1aa] font-semibold">
                 {listedAgeText}
               </div>
 
               <div className="mt-3">
-                <div className="text-sm font-semibold text-[#0f172a]">
+                <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
                   Pickup location
                 </div>
                 <div className="mt-2">
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/60 text-[#0f172a] border border-white/40">
+                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] border border-white/40 dark:border-[#3f3f46]">
                     {currentItem?.pickupLocation}
                   </span>
                 </div>
@@ -305,7 +305,7 @@ const bookedRanges = useMemo(() => {
                 <button
                   type="button"
                   onClick={openChat}
-                  className="bg-white/80 hover:bg-white text-[#0f172a] font-semibold rounded-xl px-6 py-3 transition-all duration-200 border border-white/40"
+                  className="bg-white/80 dark:bg-[#18181b]/80 hover:bg-white text-[#0f172a] dark:text-[#f4f4f5] font-semibold rounded-xl px-6 py-3 transition-all duration-200 border border-white/40 dark:border-[#3f3f46]"
                 >
                   Message Owner
                 </button>
@@ -315,6 +315,7 @@ const bookedRanges = useMemo(() => {
                 <BookingModal
                   open={bookingModalOpen}
                   item={currentItem}
+                  bookedRanges={bookedRanges}
                   onClose={() => setBookingModalOpen(false)}
                   pending={bookingPending}
                   error={bookingError}
@@ -324,9 +325,9 @@ const bookedRanges = useMemo(() => {
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-md p-6">
-            <h2 className="text-xl font-extrabold text-[#0f172a]">Description</h2>
-            <p className="mt-3 text-sm text-[#0f172a] leading-relaxed">
+          <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6">
+            <h2 className="text-xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">Description</h2>
+            <p className="mt-3 text-sm text-[#0f172a] dark:text-[#f4f4f5] leading-relaxed">
               {currentItem?.description}
             </p>
             {Array.isArray(currentItem?.tags) && currentItem.tags.length > 0 && (
@@ -334,7 +335,7 @@ const bookedRanges = useMemo(() => {
                 {currentItem.tags.map((t) => (
                   <span
                     key={t}
-                    className="px-3 py-1 rounded-full text-xs font-semibold bg-white/60 text-[#0f172a] border border-white/40"
+                    className="px-3 py-1 rounded-full text-xs font-semibold bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] border border-white/40 dark:border-[#3f3f46]"
                   >
                     {t}
                   </span>
@@ -343,20 +344,19 @@ const bookedRanges = useMemo(() => {
             )}
           </div>
 
-          <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-md p-6">
-            <h2 className="text-xl font-extrabold text-[#0f172a]">Owner</h2>
+          <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6">
+            <h2 className="text-xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">Owner</h2>
             <div className="mt-4 flex items-center gap-4">
               <img
                 src={
-                  item?.owner?.avatar ||
-                  "https://via.placeholder.com/80x80.png?text=U"
+                  item?.owner?.avatar || "/default-avatar.svg"
                 }
                 alt={ownerName || "Owner"}
-                className="w-16 h-16 rounded-full object-cover border border-white/40"
+                className="w-16 h-16 rounded-full object-cover border border-white/40 dark:border-[#3f3f46]"
               />
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <div className="font-extrabold text-[#0f172a] text-lg">
+                  <div className="font-extrabold text-[#0f172a] dark:text-[#f4f4f5] text-lg">
                     {ownerName || "Unknown"}
                   </div>
                   {item?.owner?.verifiedBadge && (
@@ -366,11 +366,11 @@ const bookedRanges = useMemo(() => {
                   )}
                 </div>
 
-                <div className="mt-2 text-sm text-[#64748b] font-semibold">
+                <div className="mt-2 text-sm text-[#64748b] dark:text-[#a1a1aa] font-semibold">
                   Rating: {item?.owner?.rating ? item.owner.rating.toFixed(1) : "0.0"}{" "}
-                  <span className="text-xs text-[#64748b]">(Trust score)</span>
+                  <span className="text-xs text-[#64748b] dark:text-[#a1a1aa]">(Trust score)</span>
                 </div>
-                <div className="mt-2 flex flex-wrap gap-2 text-sm text-[#64748b] font-semibold">
+                <div className="mt-2 flex flex-wrap gap-2 text-sm text-[#64748b] dark:text-[#a1a1aa] font-semibold">
                   <span>Fellows lent: {item?.owner?.totalLent || 0}</span>
                   <span>Response: {item?.owner?.responseRate || 100}%</span>
                 </div>
@@ -378,14 +378,14 @@ const bookedRanges = useMemo(() => {
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-md p-6">
-            <h2 className="text-xl font-extrabold text-[#0f172a]">Reviews</h2>
+          <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6">
+            <h2 className="text-xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">Reviews</h2>
             {reviewsLoading ? (
               <div className="mt-4 space-y-3">
                 {Array.from({ length: 3 }).map((_, i) => (
                   <div
                     key={i}
-                    className="h-36 rounded-2xl bg-white/60 border border-white/40 animate-pulse"
+                    className="h-36 rounded-2xl bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] animate-pulse"
                   />
                 ))}
               </div>
@@ -394,7 +394,7 @@ const bookedRanges = useMemo(() => {
                 {reviewsError}
               </div>
             ) : reviews?.length === 0 ? (
-              <div className="mt-4 text-sm text-[#64748b] font-semibold">
+              <div className="mt-4 text-sm text-[#64748b] dark:text-[#a1a1aa] font-semibold">
                 No reviews yet. Be the first after a successful return.
               </div>
             ) : (
@@ -418,14 +418,14 @@ const bookedRanges = useMemo(() => {
             )}
 
             {authed && !myRequestsLoading && !reviewBooking && (
-              <div className="mt-4 text-sm text-[#64748b] font-semibold">
+              <div className="mt-4 text-sm text-[#64748b] dark:text-[#a1a1aa] font-semibold">
                 Leave a review after returning this item.
               </div>
             )}
           </div>
 
-          <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-md p-6">
-            <h2 className="text-xl font-extrabold text-[#0f172a]">
+          <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6">
+            <h2 className="text-xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">
               Similar items
             </h2>
             {similarLoading ? (
@@ -433,12 +433,12 @@ const bookedRanges = useMemo(() => {
                 {Array.from({ length: 2 }).map((_, i) => (
                   <div
                     key={i}
-                    className="h-[220px] rounded-2xl bg-white/60 border border-white/40 animate-pulse"
+                    className="h-[220px] rounded-2xl bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] animate-pulse"
                   />
                 ))}
               </div>
             ) : similar.length === 0 ? (
-              <div className="mt-4 text-sm text-[#64748b] font-semibold">
+              <div className="mt-4 text-sm text-[#64748b] dark:text-[#a1a1aa] font-semibold">
                 No similar items found right now.
               </div>
             ) : (
@@ -447,10 +447,10 @@ const bookedRanges = useMemo(() => {
                   <button
                     key={it._id}
                     type="button"
-                    className="text-left rounded-2xl bg-white/80 backdrop-blur-md border border-white/40 p-4 shadow-md hover:scale-[1.02] hover:shadow-xl transition-all duration-200"
+                    className="text-left rounded-2xl bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] p-4 shadow-md hover:scale-[1.02] hover:shadow-xl hover:border-[#f97316]/50 hover:ring-2 hover:ring-[#f97316]/20 transition-all duration-200"
                     onClick={() => navigate(`/item/${it._id}`)}
                   >
-                    <div className="aspect-square rounded-xl overflow-hidden border border-white/40 bg-white/60">
+                    <div className="aspect-square rounded-xl overflow-hidden border border-white/40 dark:border-[#3f3f46] bg-white/60 dark:bg-[#1f1f22]/60">
                       {it.images?.[0] ? (
                         <img
                           src={it.images[0]}
@@ -458,15 +458,15 @@ const bookedRanges = useMemo(() => {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[#64748b] text-sm font-semibold">
+                        <div className="w-full h-full flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] text-sm font-semibold">
                           No image
                         </div>
                       )}
                     </div>
-                    <div className="mt-3 font-extrabold text-[#0f172a]">
+                    <div className="mt-3 font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">
                       {it.title}
                     </div>
-                    <div className="mt-2 text-sm text-[#64748b] font-semibold">
+                    <div className="mt-2 text-sm text-[#64748b] dark:text-[#a1a1aa] font-semibold">
                       {it.listingType === "Exchange" || it.price === 0
                         ? "Free Exchange"
                         : `₹${it.price}/day`}

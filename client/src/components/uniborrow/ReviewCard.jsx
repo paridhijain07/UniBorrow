@@ -31,8 +31,7 @@ const ReviewCard = ({ review }) => {
         <div className="flex items-center gap-3">
           <img
             src={
-              reviewer?.avatar ||
-              "https://via.placeholder.com/64x64.png?text=U"
+              reviewer?.avatar || "/default-avatar.svg"
             }
             alt={reviewer?.name || "Reviewer"}
             className="w-12 h-12 rounded-full object-cover border border-white/40"

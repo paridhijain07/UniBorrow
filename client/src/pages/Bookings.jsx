@@ -58,7 +58,7 @@ const Bookings = () => {
   const openReview = (booking) => {
     if (!booking) return;
     if (booking.status !== "returned") return;
-    if (booking.reviewLeft !== false) return;
+    if (booking.reviewLeft) return;
     setReviewBookingId(booking._id);
     setReviewModalOpen(true);
   };
@@ -220,7 +220,16 @@ const Bookings = () => {
                           <div className="text-lg font-extrabold text-[#0f172a] mt-1">
                             {item?.listingType === "Exchange" || item?.price === 0
                               ? "Free Exchange"
-                              : `₹${b.totalCost ?? 0}`}
+                              : (
+                                <div className="flex items-center gap-2">
+                                  <span>₹{b.totalCost ?? 0}</span>
+                                  {b.penaltyAmount > 0 && (
+                                    <span className="text-sm text-red-600 font-bold bg-red-100 px-2 py-0.5 rounded-full whitespace-nowrap">
+                                      + ₹{b.penaltyAmount} Late Fee
+                                    </span>
+                                  )}
+                                </div>
+                              )}
                           </div>
                         </div>
 
@@ -270,7 +279,7 @@ const Bookings = () => {
 
                       {tab === "mine" && (
                         <>
-                          {b.status === "returned" && b.reviewLeft === false && (
+                          {b.status === "returned" && !b.reviewLeft && (
                             <button
                               type="button"
                               disabled={actionPending}

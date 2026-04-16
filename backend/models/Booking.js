@@ -20,6 +20,9 @@ const BookingSchema = new mongoose.Schema(
 
     reviewLeft: { type: Boolean, default: false },
 
+    penaltyAmount: { type: Number, default: 0 },
+    lastPenaltyAppliedDate: { type: Date },
+
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: false }
