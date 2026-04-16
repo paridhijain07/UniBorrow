@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Bell, Menu, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
+import logo from "../../assets/logo.png";
 import { api } from "../../api/axiosConfig";
 import { useAuth } from "../../context/AuthContext.jsx";
 
@@ -86,9 +87,10 @@ const Navbar = () => {
         <div className="flex items-center gap-3">
           <Link
             to="/"
-            className="font-extrabold tracking-wide text-white"
+            className="flex items-center gap-2 font-extrabold tracking-wide text-white text-xl hover:opacity-80 transition-opacity"
             onClick={() => setMobileOpen(false)}
           >
+            <img src={logo} alt="UniBorrow Logo" className="h-8 w-auto object-contain drop-shadow-md" />
             UniBorrow
           </Link>
         </div>
