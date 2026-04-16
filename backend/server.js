@@ -36,10 +36,16 @@ const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 const _dirname=path.resolve();
-const allowedOrigins = (process.env.CORS_ORIGINS || process.env.CLIENT_URL || "")
+const envOrigins = (process.env.CORS_ORIGINS || process.env.CLIENT_URL || "")
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
+
+const allowedOrigins = [
+  "https://uniborrow.onrender.com",
+  "https://uniborrow.onrender.com/",
+  ...envOrigins
+];
 
 // Connect to MongoDB
 connectDB().then(() => {
