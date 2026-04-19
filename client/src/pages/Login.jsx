@@ -21,23 +21,46 @@ const Login = () => {
     return Object.keys(nextErrors).length === 0;
   };
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+  // const onSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!validate()) return;
 
-    setPending(true);
-    try {
-      await login({ email, password });
-      toast.success("Logged in successfully");
+  //   setPending(true);
+  //   try {
+  //     await login({ email, password });
+  //     toast.success("Logged in successfully");
+  //     navigate("/dashboard");
+  //   } catch (err) {
+  //     const msg =
+  //       err?.response?.data?.message || err?.message || "Login failed";
+  //     toast.error(msg);
+  //   } finally {
+  //     setPending(false);
+  //   }
+  // };
+  const onSubmit = async (e) => {
+  e.preventDefault();
+  if (!validate()) return;
+
+  setPending(true);
+  try {
+    const user = await login({ email, password }); // 🔥 GET USER
+
+    toast.success("Logged in successfully");
+
+    if (user?.role === "admin") {
+      navigate("/admin");
+    } else {
       navigate("/dashboard");
-    } catch (err) {
-      const msg =
-        err?.response?.data?.message || err?.message || "Login failed";
-      toast.error(msg);
-    } finally {
-      setPending(false);
     }
-  };
+  } catch (err) {
+    const msg =
+      err?.response?.data?.message || err?.message || "Login failed";
+    toast.error(msg);
+  } finally {
+    setPending(false);
+  }
+};
 
   return (
     <div className="max-w-xl mx-auto px-4 py-10 w-full">

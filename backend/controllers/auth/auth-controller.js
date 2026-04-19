@@ -8,6 +8,7 @@ const publicUserShape = (user) => ({
   name: user.name,
   email: user.email,
   avatar: user.avatar,
+  role: user.role,
   bio: user.bio,
   verified: user.verified,
   verifiedBadge: user.verifiedBadge,

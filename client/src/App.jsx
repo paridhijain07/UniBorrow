@@ -2,6 +2,10 @@ import { Route, Routes } from "react-router-dom";
 
 import PrivateRoute from "./components/PrivateRoute.jsx";
 import AppLayout from "./components/layout/AppLayout.jsx";
+import AdminRoute from "./components/AdminRoute.jsx";
+import AdminDashboard from "./pages/admin-view/dashboard.jsx";
+import AdminProducts from "./pages/admin-view/products.jsx";
+import AdminOrders from "./pages/admin-view/orders.jsx";
 
 import Home from "./pages/Home.jsx";
 import Browse from "./pages/Browse.jsx";
@@ -35,6 +39,11 @@ const App = () => {
           <Route path="/chat/:userId" element={<ChatThread />} />
           <Route path="/notifications" element={<Notifications />} />
         </Route>
+        <Route element={<AdminRoute />}>
+  <Route path="/admin" element={<AdminDashboard />} />
+  <Route path="/admin/products" element={<AdminProducts />} />
+  <Route path="/admin/orders" element={<AdminOrders />} />
+</Route>
 
         <Route path="/profile/:id" element={<Profile />} />
 

@@ -16,7 +16,12 @@ const auth = (req, res, next) => {
         message: "Unauthorized: missing token",
       });
     }
-
+    const admin = (req, res, next) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Access denied" });
+  }
+  next();
+};
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     return next();

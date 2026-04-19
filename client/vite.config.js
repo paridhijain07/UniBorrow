@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite"
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const apiTarget = env.VITE_API_URL || "http://localhost:5003";
+  const apiTarget = env.VITE_API_URL || "http://localhost:5000";
   const recoTarget = env.VITE_RECO_API_URL || "http://localhost:8000";
 
   return {
@@ -20,6 +20,7 @@ export default defineConfig(({ mode }) => {
         "/api": {
           target: apiTarget,
           changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, ""),
         },
         "/reco-api": {
           target: recoTarget,

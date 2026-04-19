@@ -1,100 +1,206 @@
-const Order = require("../../models/Order");
+// const Order = require("../../models/Order");
 
+// const getAllOrdersOfAllUsers = async (req, res) => {
+//   try {
+//     const orders = await Order.find({});
+
+//     if (!orders.length) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "No orders found!",
+//       });
+//     }
+
+//     res.status(200).json({
+//       success: true,
+//       data: orders,
+//     });
+//   } catch (e) {
+//     console.log(e);
+//     res.status(500).json({
+//       success: false,
+//       message: "Some error occured!",
+//     });
+//   }
+// };
+
+// const getOrderDetailsForAdmin = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const order = await Order.findById(id);
+
+//     if (!order) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Order not found!",
+//       });
+//     }
+
+//     res.status(200).json({
+//       success: true,
+//       data: order,
+//     });
+//   } catch (e) {
+//     console.log(e);
+//     res.status(500).json({
+//       success: false,
+//       message: "Some error occured!",
+//     });
+//   }
+// };
+
+// const updateOrderStatus = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const { orderStatus } = req.body;
+
+//     const order = await Order.findById(id);
+
+//     if (!order) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Order not found!",
+//       });
+//     }
+
+//     const allowedStatuses = [
+//       "pending",
+//       "inProcess",
+//       "inShipping",
+//       "delivered",
+//       "confirmed",
+//       "rejected",
+//       "cancelled",
+//     ];
+
+//     if (!allowedStatuses.includes(orderStatus)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid order status",
+//       });
+//     }
+
+//     await Order.findByIdAndUpdate(id, {
+//       orderStatus,
+//       orderUpdateDate: new Date(),
+//     });
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Order status is updated successfully!",
+//     });
+//   } catch (e) {
+//     console.log(e);
+//     res.status(500).json({
+//       success: false,
+//       message: "Some error occured!",
+//     });
+//   }
+// };
+
+// module.exports = {
+//   getAllOrdersOfAllUsers,
+//   getOrderDetailsForAdmin,
+//   updateOrderStatus,
+// };
+
+const Booking = require("../../models/Booking");
+
+// 🔥 GET ALL BOOKINGS (instead of orders)
 const getAllOrdersOfAllUsers = async (req, res) => {
   try {
-    const orders = await Order.find({});
+    const bookings = await Booking.find({})
+      .populate("item")
+      .populate("borrower")
+      .populate("owner");
 
-    if (!orders.length) {
+    if (!bookings.length) {
       return res.status(404).json({
         success: false,
-        message: "No orders found!",
+        message: "No bookings found!",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: orders,
+      data: bookings,
     });
   } catch (e) {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Some error occured!",
+      message: "Some error occurred!",
     });
   }
 };
 
+// 🔥 GET SINGLE BOOKING
 const getOrderDetailsForAdmin = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const order = await Order.findById(id);
+    const booking = await Booking.findById(id)
+      .populate("item")
+      .populate("borrower")
+      .populate("owner");
 
-    if (!order) {
+    if (!booking) {
       return res.status(404).json({
         success: false,
-        message: "Order not found!",
+        message: "Booking not found!",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: order,
+      data: booking,
     });
   } catch (e) {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Some error occured!",
+      message: "Some error occurred!",
     });
   }
 };
 
+// 🔥 UPDATE BOOKING STATUS
 const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { orderStatus } = req.body;
+    const { status } = req.body;
 
-    const order = await Order.findById(id);
+    const booking = await Booking.findById(id);
 
-    if (!order) {
+    if (!booking) {
       return res.status(404).json({
         success: false,
-        message: "Order not found!",
+        message: "Booking not found!",
       });
     }
 
-    const allowedStatuses = [
-      "pending",
-      "inProcess",
-      "inShipping",
-      "delivered",
-      "confirmed",
-      "rejected",
-      "cancelled",
-    ];
+    const allowedStatuses = ["pending", "approved", "rejected", "returned"];
 
-    if (!allowedStatuses.includes(orderStatus)) {
+    if (!allowedStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid order status",
+        message: "Invalid booking status",
       });
     }
 
-    await Order.findByIdAndUpdate(id, {
-      orderStatus,
-      orderUpdateDate: new Date(),
-    });
+    booking.status = status;
+    await booking.save();
 
     res.status(200).json({
       success: true,
-      message: "Order status is updated successfully!",
+      message: "Booking status updated successfully!",
     });
   } catch (e) {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Some error occured!",
+      message: "Some error occurred!",
     });
   }
 };

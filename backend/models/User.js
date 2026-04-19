@@ -33,6 +33,11 @@ const UserSchema = new mongoose.Schema(
       enum: pickupZones,
       required: true,
     },
+    role: {
+  type: String,
+  enum: ["user", "admin"],
+  default: "user"
+},
 
     createdAt: { type: Date, default: Date.now },
   },

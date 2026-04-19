@@ -44,6 +44,7 @@ const envOrigins = (process.env.CORS_ORIGINS || process.env.CLIENT_URL || "")
 const allowedOrigins = [
   "https://uniborrow.onrender.com",
   "https://uniborrow.onrender.com/",
+  "http://localhost:5173",
   ...envOrigins
 ];
 
