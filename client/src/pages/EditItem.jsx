@@ -65,10 +65,10 @@ const EditItem = () => {
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-10 w-full">
-        <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-md p-6">
-          <div className="h-8 bg-white/60 border border-white/40 rounded-xl animate-pulse" />
-          <div className="mt-4 h-6 bg-white/60 border border-white/40 rounded-xl animate-pulse" />
-          <div className="mt-4 h-36 bg-white/60 border border-white/40 rounded-2xl animate-pulse" />
+        <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6">
+          <div className="h-8 bg-white/60 dark:bg-[#27272a] border border-white/40 dark:border-[#3f3f46] rounded-xl animate-pulse" />
+          <div className="mt-4 h-6 bg-white/60 dark:bg-[#27272a] border border-white/40 dark:border-[#3f3f46] rounded-xl animate-pulse" />
+          <div className="mt-4 h-36 bg-white/60 dark:bg-[#27272a] border border-white/40 dark:border-[#3f3f46] rounded-2xl animate-pulse" />
         </div>
       </div>
     );
@@ -77,7 +77,7 @@ const EditItem = () => {
   if (error) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-10 w-full">
-        <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-md p-6 text-[#ef4444] font-semibold">
+        <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6 text-[#ef4444] font-semibold">
           {error}
         </div>
       </div>
@@ -87,7 +87,7 @@ const EditItem = () => {
   if (!initialValues) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-10 w-full">
-        <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-md p-6 text-[#64748b] font-semibold">
+        <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6 text-[#64748b] dark:text-[#a1a1aa] font-semibold">
           Item not found.
         </div>
       </div>

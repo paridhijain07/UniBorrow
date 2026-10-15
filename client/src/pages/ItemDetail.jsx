@@ -35,7 +35,7 @@ const ItemDetail = () => {
   const { create: createBooking, pending: bookingPending, error: bookingError } =
     useCreateBooking();
 
-  const { data: myRequests, loading: myRequestsLoading, error: myRequestsError, refetch: refetchMyRequests } =
+  const { data: myRequests, loading: myRequestsLoading, refetch: refetchMyRequests } =
     useMyRequests();
 
   const [bookingModalOpen, setBookingModalOpen] = useState(false);

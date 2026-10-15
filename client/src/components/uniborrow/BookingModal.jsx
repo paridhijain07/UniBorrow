@@ -78,16 +78,16 @@ const BookingModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
-      <div className="w-full max-w-2xl bg-white/80 backdrop-blur-md rounded-2xl border border-white/40 shadow-xl p-5">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+      <div className="w-full max-w-2xl bg-white/95 dark:bg-[#18181b]/95 backdrop-blur-md rounded-3xl border border-gray-200 dark:border-[#3f3f46] shadow-2xl p-6">
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-extrabold text-[#0f172a]">
+          <h3 className="text-xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">
             Request to Borrow
           </h3>
           <button
             type="button"
             onClick={onClose}
-            className="text-[#0f172a] font-semibold"
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 font-semibold"
           >
             Close
           </button>
@@ -96,39 +96,39 @@ const BookingModal = ({
         <form className="mt-4 space-y-4" onSubmit={(e) => e.preventDefault()}>
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">
+              <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
                 Start date
               </label>
               <input
                 type="date"
-                className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                className="mt-1 w-full border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#202024] text-[#0f172a] dark:text-[#f4f4f5] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">
+              <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
                 End date
               </label>
               <input
                 type="date"
-                className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                className="mt-1 w-full border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#202024] text-[#0f172a] dark:text-[#f4f4f5] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
               />
             </div>
           </div>
 
-          <div className="bg-white/60 border border-white/40 rounded-2xl p-4">
+          <div className="bg-gray-50 dark:bg-[#202024] border border-gray-200 dark:border-[#2f2f35] rounded-2xl p-4">
             <div className="flex items-center justify-between">
-              <div className="text-sm font-semibold text-[#0f172a]">
+              <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
                 Total cost
               </div>
-              <div className="text-lg font-extrabold text-[#0f172a]">
+              <div className="text-lg font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">
                 {item?.listingType === "Rent" ? `₹${totalCost}` : "Free Exchange"}
               </div>
             </div>
-            <div className="text-sm text-[#64748b] mt-2">
+            <div className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-2">
               {totalDays ? `${totalDays} day(s) selected` : "Select dates to preview total"}
             </div>
           </div>
@@ -143,7 +143,7 @@ const BookingModal = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-3 rounded-xl bg-white/80 hover:bg-white border border-white/40 font-semibold text-[#0f172a] transition-all duration-200"
+              className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-[#27272a] dark:hover:bg-[#323238] border border-gray-200 dark:border-[#3f3f46] font-semibold text-[#0f172a] dark:text-[#f4f4f5] transition-all duration-200"
             >
               Cancel
             </button>
@@ -151,7 +151,7 @@ const BookingModal = ({
               type="button"
               disabled={!canSubmit}
               onClick={() => void submit()}
-              className="bg-[#f97316] hover:bg-[#ea6c0a] text-white font-semibold rounded-xl px-6 py-3 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="bg-[#f97316] hover:bg-[#ea6c0a] text-white font-semibold rounded-xl px-6 py-2.5 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {pending ? "Submitting..." : "Confirm Request"}
             </button>

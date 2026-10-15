@@ -14,10 +14,11 @@ const isDayWithinRange = (day, start, end) => {
 };
 
 const AvailabilityCalendar = ({ bookedRanges = [], days = 30 }) => {
-  const today = new Date();
-
   const cells = useMemo(() => {
+    const today = new Date();
+    const todayMidnight = new Date(today.toDateString()).getTime();
     const list = [];
+
     for (let i = 0; i < days; i += 1) {
       const day = new Date(today);
       day.setDate(today.getDate() + i);
@@ -27,8 +28,7 @@ const AvailabilityCalendar = ({ bookedRanges = [], days = 30 }) => {
       );
 
       const isToday =
-        new Date(day.toDateString()).getTime() ===
-        new Date(today.toDateString()).getTime();
+        new Date(day.toDateString()).getTime() === todayMidnight;
 
       list.push({
         key: day.toISOString().slice(0, 10),
@@ -38,13 +38,13 @@ const AvailabilityCalendar = ({ bookedRanges = [], days = 30 }) => {
       });
     }
     return list;
-  }, [bookedRanges, days, today]);
+  }, [bookedRanges, days]);
 
   return (
-    <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl p-4 shadow-md">
+    <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#27272a] rounded-2xl p-4 shadow-md">
       <div className="flex items-center justify-between">
-        <h3 className="font-extrabold text-[#0f172a]">Availability</h3>
-        <div className="flex items-center gap-3 text-xs text-[#64748b]">
+        <h3 className="font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">Availability</h3>
+        <div className="flex items-center gap-3 text-xs text-[#64748b] dark:text-[#a1a1aa]">
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded bg-[#22c55e]" />
             Available
@@ -74,7 +74,7 @@ const AvailabilityCalendar = ({ bookedRanges = [], days = 30 }) => {
             <div
               key={c.key}
               className={
-                "h-10 rounded-lg border border-white/40 flex items-center justify-center text-xs font-bold " +
+                "h-10 rounded-lg border border-white/40 dark:border-transparent flex items-center justify-center text-xs font-bold shadow-sm " +
                 cls
               }
               title={c.booked ? "Booked" : "Available"}

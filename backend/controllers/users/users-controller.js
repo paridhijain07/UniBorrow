@@ -4,12 +4,12 @@ const User = require("../../models/User");
 const Item = require("../../models/Item");
 const Review = require("../../models/Review");
 
-const getPublicUser = (userDoc) => {
+const getPublicUser = (userDoc, includeEmail = false) => {
   if (!userDoc) return null;
   return {
     id: userDoc._id,
     name: userDoc.name,
-    email: userDoc.email,
+    ...(includeEmail ? { email: userDoc.email } : {}),
     avatar: userDoc.avatar,
     bio: userDoc.bio,
     verified: userDoc.verified,
@@ -76,7 +76,7 @@ const updateMyProfile = async (req, res, next) => {
       "name email avatar bio verified verifiedBadge rating totalRatings responseRate totalLent totalBorrowed pickupZone createdAt"
     );
 
-    return res.json({ user: getPublicUser(updated) });
+    return res.json({ user: getPublicUser(updated, true) });
   } catch (err) {
     return next(err);
   }

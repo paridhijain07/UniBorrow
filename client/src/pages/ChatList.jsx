@@ -4,7 +4,8 @@ import { io } from "socket.io-client";
 import { getConversations } from "../api/messages.api";
 import { useAuth } from "../hooks/useAuth.js";
 
-const SOCKET_URL = import.meta.env.VITE_API_URL.replace("/api", "");
+const rawApiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const SOCKET_URL = rawApiUrl.replace(/\/api\/?$/, "");
 
 const ChatList = () => {
   const navigate = useNavigate();

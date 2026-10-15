@@ -160,7 +160,6 @@ const Browse = () => {
     };
 
     run();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     debouncedSearch,
     query.category,

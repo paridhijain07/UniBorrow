@@ -6,7 +6,7 @@ import { createReview } from "../../api/reviews.api.js";
 const StarSelect = ({ label, value, onChange }) => {
   return (
     <div>
-      <div className="text-sm font-semibold text-[#0f172a]">{label}</div>
+      <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">{label}</div>
       <div className="flex items-center gap-1 mt-2">
         {Array.from({ length: 5 }).map((_, idx) => {
           const v = idx + 1;
@@ -19,7 +19,7 @@ const StarSelect = ({ label, value, onChange }) => {
               className={
                 on
                   ? "text-[#f97316] font-black text-xl leading-none"
-                  : "text-[#64748b] font-bold text-xl leading-none hover:text-[#f97316]"
+                  : "text-[#64748b] dark:text-gray-500 font-bold text-xl leading-none hover:text-[#f97316]"
               }
               aria-label={`${label} ${v} stars`}
             >
@@ -27,7 +27,7 @@ const StarSelect = ({ label, value, onChange }) => {
             </button>
           );
         })}
-        <span className="ml-3 text-xs text-[#64748b] font-semibold">
+        <span className="ml-3 text-xs text-[#64748b] dark:text-[#a1a1aa] font-semibold">
           {value || 0}/5
         </span>
       </div>
@@ -90,11 +90,11 @@ const ReviewForm = ({ bookingId, onSuccess }) => {
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-md p-5">
-      <h3 className="text-xl font-extrabold text-[#0f172a]">
+    <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#27272a] rounded-2xl shadow-md p-5">
+      <h3 className="text-xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">
         Leave a review
       </h3>
-      <p className="text-sm text-[#64748b] mt-2">
+      <p className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-2">
         Multi-criteria ratings help students borrow with confidence.
       </p>
 
@@ -124,9 +124,9 @@ const ReviewForm = ({ bookingId, onSuccess }) => {
       </div>
 
       <div className="mt-4">
-        <div className="text-sm font-semibold text-[#0f172a]">Comment</div>
+        <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">Comment</div>
         <textarea
-          className="mt-2 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+          className="mt-2 w-full border border-gray-300 dark:border-[#3f3f46] bg-white/60 dark:bg-[#202024] text-[#0f172a] dark:text-[#f4f4f5] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
           rows={4}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
@@ -138,7 +138,7 @@ const ReviewForm = ({ bookingId, onSuccess }) => {
         type="button"
         disabled={!canSubmit || pending}
         onClick={() => void handleSubmit()}
-        className="mt-5 bg-[#f97316] hover:bg-[#ea6c0a] text-white font-semibold rounded-xl px-6 py-3 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25 disabled:opacity-60 disabled:cursor-not-allowed"
+        className="mt-5 bg-[#f97316] hover:bg-[#ea6c0a] text-white font-semibold rounded-xl px-6 py-2.5 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25 disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {pending ? "Submitting..." : "Submit Review"}
       </button>

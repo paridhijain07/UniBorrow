@@ -11,7 +11,7 @@ const AddItem = () => {
   const { user } = useAuth();
   const authed = Boolean(user?.id);
 
-  const { create, pending, error } = useCreateItem();
+  const { create, pending } = useCreateItem();
   const [localPending, setLocalPending] = useState(false);
 
   const submitLabel = useMemo(() => "Publish Listing", []);

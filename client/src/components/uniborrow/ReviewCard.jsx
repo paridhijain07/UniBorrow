@@ -6,8 +6,7 @@ const StarsRow = ({ value }) => {
         const on = idx + 1 <= v;
         return (
           <span
-            // eslint-disable-next-line react/no-array-index-key
-            key={idx}
+            key={`star-${idx}`}
             className={on ? "text-[#f97316] font-black" : "text-[#64748b] font-bold"}
           >
             ★

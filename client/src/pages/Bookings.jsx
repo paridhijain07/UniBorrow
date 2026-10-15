@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 import { useAuth } from "../hooks/useAuth.js";
@@ -48,12 +48,6 @@ const Bookings = () => {
 
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviewBookingId, setReviewBookingId] = useState(null);
-
-  const reviewEligible = useMemo(() => {
-    // For MVP: only allow leaving review from "My Borrow Requests" tab cards.
-    if (!reviewBookingId) return false;
-    return true;
-  }, [reviewBookingId]);
 
   const openReview = (booking) => {
     if (!booking) return;

@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 import { getThread, sendMessage } from "../api/messages.api";
 import { useAuth } from "../hooks/useAuth.js";
 
 // Ensure socket connects to the backend base URL (stripping out /api)
-const SOCKET_URL = import.meta.env.VITE_API_URL.replace("/api", "");
+const rawApiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const SOCKET_URL = rawApiUrl.replace(/\/api\/?$/, "");
 
 const ChatThread = () => {
   const { userId } = useParams();

@@ -75,7 +75,8 @@ const Navbar = () => {
     if (!user?.avatar) return "/default-avatar.svg";
     let avatarUrl = user.avatar;
     if (!avatarUrl.startsWith("http") && !avatarUrl.startsWith("data:") && !avatarUrl.startsWith("/")) {
-      const baseUrl = import.meta.env.VITE_API_URL.replace("/api", "");
+      const rawApiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+      const baseUrl = rawApiUrl.replace(/\/api\/?$/, "");
       avatarUrl = `${baseUrl}${avatarUrl}`;
     }
     return avatarUrl;

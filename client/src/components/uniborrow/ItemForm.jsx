@@ -149,10 +149,10 @@ const ItemForm = ({
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 w-full">
       <div className="mb-5">
-        <div className="h-2 bg-white/40 rounded-full overflow-hidden">
+        <div className="h-2 bg-white/40 dark:bg-white/10 rounded-full overflow-hidden">
           <div className="h-full bg-[#f97316] transition-all duration-300" style={{ width: progressWidth }} />
         </div>
-        <div className="mt-3 flex items-center justify-between text-sm font-semibold text-[#64748b]">
+        <div className="mt-3 flex items-center justify-between text-sm font-semibold text-[#64748b] dark:text-[#a1a1aa]">
           <span>Step 1</span>
           <span>Step 2</span>
           <span>Step 3</span>
@@ -160,13 +160,13 @@ const ItemForm = ({
         </div>
       </div>
 
-      <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-md p-6">
+      <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6">
         {step === 1 && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">Title</label>
+              <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">Title</label>
               <input
-                className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                className="mt-1 w-full border border-white/40 dark:border-[#3f3f46] bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40 placeholder:text-[#94a3b8] dark:placeholder:text-[#71717a]"
                 value={values.title}
                 onChange={(e) => setValues((v) => ({ ...v, title: e.target.value }))}
                 placeholder="e.g., Mechanical Keyboard"
@@ -176,28 +176,28 @@ const ItemForm = ({
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-[#0f172a]">Category</label>
+                <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">Category</label>
                 <select
-                  className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                  className="mt-1 w-full border border-white/40 dark:border-[#3f3f46] bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
                   value={values.category}
                   onChange={(e) => setValues((v) => ({ ...v, category: e.target.value }))}
                 >
                   {categories.map((c) => (
-                    <option value={c} key={c}>{c}</option>
+                    <option value={c} key={c} className="bg-white dark:bg-[#1f1f22] text-[#0f172a] dark:text-[#f4f4f5]">{c}</option>
                   ))}
                 </select>
                 {errors.category && <div className="text-sm text-[#ef4444] font-semibold mt-1">{errors.category}</div>}
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-[#0f172a]">Condition</label>
+                <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">Condition</label>
                 <select
-                  className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                  className="mt-1 w-full border border-white/40 dark:border-[#3f3f46] bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
                   value={values.condition}
                   onChange={(e) => setValues((v) => ({ ...v, condition: e.target.value }))}
                 >
                   {conditions.map((c) => (
-                    <option value={c} key={c}>{c}</option>
+                    <option value={c} key={c} className="bg-white dark:bg-[#1f1f22] text-[#0f172a] dark:text-[#f4f4f5]">{c}</option>
                   ))}
                 </select>
                 {errors.condition && <div className="text-sm text-[#ef4444] font-semibold mt-1">{errors.condition}</div>}
@@ -205,7 +205,7 @@ const ItemForm = ({
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">Listing type</label>
+              <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">Listing type</label>
               <div className="mt-2 flex flex-wrap gap-2">
                 {listingTypes.map((t) => {
                   const active = values.listingType === t;
@@ -225,7 +225,7 @@ const ItemForm = ({
                         "px-4 py-2 rounded-xl border font-semibold text-sm transition-all duration-200 " +
                         (active
                           ? "bg-[#f97316] text-white border-[#f97316]"
-                          : "bg-white/60 text-[#0f172a] border-white/40 hover:bg-white/80")
+                          : "bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] border-white/40 dark:border-[#3f3f46] hover:bg-white/80 dark:hover:bg-[#27272a]")
                       }
                     >
                       {t}
@@ -242,13 +242,13 @@ const ItemForm = ({
           <div className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-[#0f172a]">
+                <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
                   Price / day {values.listingType === "Rent" ? "" : "(Exchange = 0)"}
                 </label>
                 <input
                   type="number"
                   min={0}
-                  className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                  className="mt-1 w-full border border-white/40 dark:border-[#3f3f46] bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
                   value={values.price}
                   onChange={(e) => setValues((v) => ({ ...v, price: e.target.value }))}
                   disabled={values.listingType !== "Rent"}
@@ -257,13 +257,13 @@ const ItemForm = ({
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-[#0f172a]">
+                <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
                   Original price
                 </label>
                 <input
                   type="number"
                   min={0}
-                  className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                  className="mt-1 w-full border border-white/40 dark:border-[#3f3f46] bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
                   value={values.originalPrice}
                   onChange={(e) => setValues((v) => ({ ...v, originalPrice: e.target.value }))}
                 />
@@ -272,10 +272,10 @@ const ItemForm = ({
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">Description</label>
+              <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">Description</label>
               <textarea
                 rows={5}
-                className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                className="mt-1 w-full border border-white/40 dark:border-[#3f3f46] bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40 placeholder:text-[#94a3b8] dark:placeholder:text-[#71717a]"
                 value={values.description}
                 onChange={(e) => setValues((v) => ({ ...v, description: e.target.value }))}
                 placeholder="Describe condition, accessories, what’s included..."
@@ -288,12 +288,12 @@ const ItemForm = ({
         {step === 3 && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">Image URLs (max 3)</label>
+              <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">Image URLs (max 3)</label>
               <div className="mt-3 space-y-3">
                 {[0, 1, 2].map((idx) => (
                   <input
                     key={idx}
-                    className="w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                    className="w-full border border-white/40 dark:border-[#3f3f46] bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40 placeholder:text-[#94a3b8] dark:placeholder:text-[#71717a]"
                     value={values.images[idx] || ""}
                     onChange={(e) => {
                       const next = [...values.images];
@@ -308,9 +308,9 @@ const ItemForm = ({
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">Tags (comma-separated)</label>
+              <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">Tags (comma-separated)</label>
               <input
-                className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                className="mt-1 w-full border border-white/40 dark:border-[#3f3f46] bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40 placeholder:text-[#94a3b8] dark:placeholder:text-[#71717a]"
                 value={values.tagsText}
                 onChange={(e) => setValues((v) => ({ ...v, tagsText: e.target.value }))}
                 placeholder="keyboard, mechanical, electronics"
@@ -319,14 +319,14 @@ const ItemForm = ({
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">Pickup location</label>
+              <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">Pickup location</label>
               <select
-                className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                className="mt-1 w-full border border-white/40 dark:border-[#3f3f46] bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
                 value={values.pickupLocation}
                 onChange={(e) => setValues((v) => ({ ...v, pickupLocation: e.target.value }))}
               >
                 {pickupZones.map((z) => (
-                  <option value={z} key={z}>{z}</option>
+                  <option value={z} key={z} className="bg-white dark:bg-[#1f1f22] text-[#0f172a] dark:text-[#f4f4f5]">{z}</option>
                 ))}
               </select>
               {errors.pickupLocation && <div className="text-sm text-[#ef4444] font-semibold mt-1">{errors.pickupLocation}</div>}
@@ -336,54 +336,54 @@ const ItemForm = ({
 
         {step === 4 && (
           <div className="space-y-4">
-            <h3 className="text-xl font-extrabold text-[#0f172a]">Preview</h3>
+            <h3 className="text-xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">Preview</h3>
 
-            <div className="rounded-2xl border border-white/40 bg-white/60 p-4">
-              <div className="font-extrabold text-[#0f172a] text-lg">{values.title || "Untitled"}</div>
+            <div className="rounded-2xl border border-white/40 dark:border-[#3f3f46] bg-white/60 dark:bg-[#1f1f22]/60 p-4">
+              <div className="font-extrabold text-[#0f172a] dark:text-[#f4f4f5] text-lg">{values.title || "Untitled"}</div>
               <div className="mt-2 flex flex-wrap gap-2">
                 <span className={values.listingType === "Rent"
-                  ? "bg-orange-100 text-orange-700 border border-orange-200 px-3 py-1 rounded-full text-xs font-semibold"
-                  : "bg-green-100 text-green-700 border border-green-200 px-3 py-1 rounded-full text-xs font-semibold"}>
+                  ? "bg-orange-100 dark:bg-orange-950/60 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-900/60 px-3 py-1 rounded-full text-xs font-semibold"
+                  : "bg-green-100 dark:bg-green-950/60 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900/60 px-3 py-1 rounded-full text-xs font-semibold"}>
                   {values.listingType}
                 </span>
-                <span className="bg-white/60 text-[#0f172a] border border-white/40 px-3 py-1 rounded-full text-xs font-semibold">
+                <span className="bg-white/60 dark:bg-[#27272a] text-[#0f172a] dark:text-[#f4f4f5] border border-white/40 dark:border-[#3f3f46] px-3 py-1 rounded-full text-xs font-semibold">
                   {values.condition}
                 </span>
-                <span className="bg-white/60 text-[#0f172a] border border-white/40 px-3 py-1 rounded-full text-xs font-semibold">
+                <span className="bg-white/60 dark:bg-[#27272a] text-[#0f172a] dark:text-[#f4f4f5] border border-white/40 dark:border-[#3f3f46] px-3 py-1 rounded-full text-xs font-semibold">
                   {values.category}
                 </span>
               </div>
 
-              <div className="mt-3 text-sm text-[#64748b] font-semibold">
+              <div className="mt-3 text-sm text-[#64748b] dark:text-[#a1a1aa] font-semibold">
                 {values.listingType === "Exchange" || Number(values.price) === 0
                   ? "Free Exchange"
                   : `₹${Number(values.price)}/day`}
                 {values.originalPrice && Number(values.originalPrice) > 0 ? (
-                  <span className="ml-3 line-through text-[#64748b] font-bold">
+                  <span className="ml-3 line-through text-[#64748b] dark:text-[#a1a1aa] font-bold">
                     ₹{Number(values.originalPrice)}
                   </span>
                 ) : null}
               </div>
 
-              <div className="mt-3 text-sm text-[#0f172a]">
+              <div className="mt-3 text-sm text-[#0f172a] dark:text-[#e4e4e7]">
                 {values.description || "No description"}
               </div>
 
               <div className="mt-4">
-                <div className="text-sm font-semibold text-[#0f172a]">Pickup: {values.pickupLocation}</div>
+                <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">Pickup: {values.pickupLocation}</div>
               </div>
 
               <div className="mt-3">
-                <div className="text-sm font-semibold text-[#0f172a]">Tags</div>
+                <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">Tags</div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {clampTags(values.tagsText).length ? (
                     clampTags(values.tagsText).map((t) => (
-                      <span key={t} className="px-3 py-1 rounded-full text-xs font-semibold bg-white/60 text-[#0f172a] border border-white/40">
+                      <span key={t} className="px-3 py-1 rounded-full text-xs font-semibold bg-white/60 dark:bg-[#27272a] text-[#0f172a] dark:text-[#f4f4f5] border border-white/40 dark:border-[#3f3f46]">
                         {t}
                       </span>
                     ))
                   ) : (
-                    <span className="text-[#64748b] text-sm">No tags</span>
+                    <span className="text-[#64748b] dark:text-[#a1a1aa] text-sm">No tags</span>
                   )}
                 </div>
               </div>
@@ -393,7 +393,7 @@ const ItemForm = ({
               <button
                 type="button"
                 onClick={goPrev}
-                className="px-5 py-3 rounded-xl bg-white/80 hover:bg-white border border-white/40 font-semibold text-[#0f172a] transition-all duration-200"
+                className="px-5 py-3 rounded-xl bg-white/80 dark:bg-[#27272a] hover:bg-white dark:hover:bg-[#3f3f46] border border-white/40 dark:border-[#3f3f46] font-semibold text-[#0f172a] dark:text-[#f4f4f5] transition-all duration-200"
               >
                 Back
               </button>
@@ -416,7 +416,7 @@ const ItemForm = ({
               type="button"
               onClick={goPrev}
               disabled={step === 1}
-              className="px-5 py-3 rounded-xl bg-white/80 hover:bg-white border border-white/40 font-semibold text-[#0f172a] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-3 rounded-xl bg-white/80 dark:bg-[#27272a] hover:bg-white dark:hover:bg-[#3f3f46] border border-white/40 dark:border-[#3f3f46] font-semibold text-[#0f172a] dark:text-[#f4f4f5] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Back
             </button>

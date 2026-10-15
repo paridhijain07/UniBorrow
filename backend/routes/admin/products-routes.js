@@ -9,13 +9,14 @@ const {
 } = require("../../controllers/admin/products-controller");
 
 const { upload } = require("../../helpers/cloudinary");
+const { auth, admin } = require("../../middleware/auth");
 
 const router = express.Router();
 
-router.post("/upload-image", upload.single("my_file"), handleImageUpload);
-router.post("/add", addProduct);
-router.put("/edit/:id", editProduct);
-router.delete("/delete/:id", deleteProduct);
-router.get("/get", fetchAllProducts);
+router.post("/upload-image", auth, admin, upload.single("my_file"), handleImageUpload);
+router.post("/add", auth, admin, addProduct);
+router.put("/edit/:id", auth, admin, editProduct);
+router.delete("/delete/:id", auth, admin, deleteProduct);
+router.get("/get", auth, admin, fetchAllProducts);
 
 module.exports = router;
