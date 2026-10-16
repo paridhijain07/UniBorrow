@@ -83,25 +83,32 @@ const Navbar = () => {
   }, [user?.avatar]);
 
   return (
-    <header className="bg-[#0f172a]/90 backdrop-blur-md sticky top-0 z-50 border-b border-white/10">
+    <header className="bg-white/85 dark:bg-[#0b0f19]/85 backdrop-blur-xl sticky top-0 z-50 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors duration-200">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link
             to="/"
-            className="flex items-center gap-2 font-extrabold tracking-wide text-white text-xl hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2.5 font-extrabold tracking-tight text-slate-900 dark:text-white text-xl group"
             onClick={() => setMobileOpen(false)}
           >
-            <img src={logo} alt="UniBorrow Logo" className="h-8 w-auto object-contain drop-shadow-md" />
-            UniBorrow
+            <div className="relative">
+              <img src={logo} alt="UniBorrow Logo" className="h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105" />
+            </div>
+            <span>
+              Uni<span className="text-orange-500">Borrow</span>
+            </span>
+            <span className="hidden sm:inline-block text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 ml-1">
+              Campus
+            </span>
           </Link>
         </div>
 
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-1 lg:gap-2">
           {navLinks.map((l) => (
             <Link
               key={l.to}
               to={l.to}
-              className="text-white/80 hover:text-white transition-colors"
+              className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium text-sm transition-colors px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/60"
               onClick={() => setMobileOpen(false)}
             >
               {l.label}
@@ -110,56 +117,59 @@ const Navbar = () => {
           {isAuthed && (
             <Link
               to="/dashboard"
-              className="text-white/80 hover:text-white transition-colors"
+              className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium text-sm transition-colors px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/60"
             >
               Dashboard
             </Link>
           )}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Theme Toggle Button */}
           <button
             type="button"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="text-white/80 hover:text-white p-1 flex items-center justify-center mr-1 transition-all duration-200 hover:rotate-12"
-            aria-label="Toggle Dark Mode"
+            className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200"
+            aria-label="Toggle Theme"
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
-            {mounted && (theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />)}
+            {mounted && (theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />)}
           </button>
           
           {isAuthed ? (
             <>
+              {/* Notifications Popover */}
               <div className="relative">
                 <button
                   type="button"
-                  className="text-white/80 hover:text-white"
+                  className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative"
                   onClick={() => setNotifOpen((v) => !v)}
                   aria-label="Notifications"
                 >
-                  <Bell className="w-5 h-5" />
+                  <Bell className="w-4 h-4" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1 right-1 bg-gradient-to-r from-orange-500 to-amber-600 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center ring-2 ring-white dark:ring-slate-900">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
                 </button>
-                {unreadCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-[#f97316] text-white text-xs font-bold rounded-full px-2 py-0.5">
-                    {unreadCount > 9 ? "9+" : unreadCount}
-                  </span>
-                )}
 
                 {notifOpen && (
-                  <div className="absolute right-0 mt-3 w-[340px] bg-white/80 dark:bg-[#18181b]/90 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-lg p-4 z-50">
-                    <div className="flex items-center justify-between">
-                      <p className="font-semibold text-[#0f172a] dark:text-[#f4f4f5]">Notifications</p>
+                  <div className="absolute right-0 mt-3 w-[340px] bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl p-4 z-50 ring-1 ring-black/5">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                      <p className="font-bold text-slate-900 dark:text-white text-sm">Notifications</p>
                       <button
                         type="button"
                         onClick={handleMarkAllRead}
-                        className="text-[#f97316] font-semibold"
+                        className="text-xs text-orange-600 dark:text-orange-400 hover:underline font-semibold"
                       >
                         Mark all read
                       </button>
                     </div>
 
-                    <div className="mt-3 space-y-3 max-h-[320px] overflow-auto">
+                    <div className="mt-3 space-y-2 max-h-[300px] overflow-auto">
                       {latestNotifications.length === 0 ? (
-                        <div className="text-[#64748b] dark:text-[#a1a1aa] text-sm">
+                        <div className="text-slate-400 dark:text-slate-500 text-xs py-4 text-center">
                           No notifications yet.
                         </div>
                       ) : (
@@ -175,20 +185,20 @@ const Navbar = () => {
                           >
                             <div
                               className={
-                                "p-3 rounded-xl border " +
+                                "p-2.5 rounded-xl border transition-all text-xs " +
                                 (!n.read
-                                  ? "border-[#f97316]/50 bg-orange-50/50 dark:bg-[#f97316]/10"
-                                  : "border-gray-200 dark:border-[#3f3f46] bg-white/60 dark:bg-[#1f1f22]/60")
+                                  ? "border-orange-500/30 bg-orange-50/70 dark:bg-orange-500/10"
+                                  : "border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800")
                               }
                             >
-                              <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
+                              <div className="font-bold text-slate-800 dark:text-slate-200 capitalize">
                                 {n.type.replaceAll("_", " ")}
                               </div>
-                              <div className="text-sm text-[#64748b] dark:text-[#d4d4d8] mt-1">
+                              <div className="text-slate-600 dark:text-slate-400 mt-0.5 line-clamp-2">
                                 {n.message}
                               </div>
-                              <div className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-2">
-                                {n.createdAt ? new Date(n.createdAt).toLocaleString() : ""}
+                              <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5">
+                                {n.createdAt ? new Date(n.createdAt).toLocaleDateString() : ""}
                               </div>
                             </div>
                           </button>
@@ -196,38 +206,40 @@ const Navbar = () => {
                       )}
                     </div>
 
-                    <div className="mt-3">
+                    <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-center">
                       <button
                         type="button"
-                        className="text-[#f97316] font-semibold"
+                        className="text-xs text-orange-600 dark:text-orange-400 hover:underline font-semibold"
                         onClick={() => {
                           setNotifOpen(false);
                           navigate("/notifications");
                         }}
                       >
-                        View all
+                        View all notifications →
                       </button>
                     </div>
                   </div>
                 )}
               </div>
 
+              {/* User Avatar */}
               <button
                 type="button"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 group p-0.5 rounded-full ring-2 ring-transparent hover:ring-orange-500 transition-all"
                 onClick={() => navigate("/dashboard")}
+                title="Open Dashboard"
               >
                 <img
                   src={userAvatar || "/default-avatar.svg"}
                   alt="User avatar"
-                  className="w-9 h-9 rounded-full object-cover border border-white/20"
+                  className="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-700"
                 />
               </button>
 
               <button
                 type="button"
                 onClick={handleLogout}
-                className="text-white/80 hover:text-white font-semibold"
+                className="text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 font-medium text-xs px-2.5 py-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
               >
                 Logout
               </button>
@@ -236,38 +248,40 @@ const Navbar = () => {
             <>
               <Link
                 to="/login"
-                className="text-white/80 hover:text-white font-semibold"
+                className="text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white font-medium text-sm px-3.5 py-2 transition-colors"
               >
                 Login
               </Link>
               <Link
                 to="/signup"
-                className="bg-[#f97316] hover:bg-[#ea6c0a] text-white font-semibold rounded-xl px-4 py-2 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25"
+                className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold text-sm rounded-xl px-4 py-2 transition-all duration-200 shadow-md shadow-orange-500/20 hover:shadow-orange-500/35 active:scale-95"
               >
                 Sign up
               </Link>
             </>
           )}
-        </div>
 
-        <button
-          type="button"
-          className="md:hidden text-white/80 hover:text-white"
-          onClick={() => setMobileOpen((v) => !v)}
-          aria-label="Open menu"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
+          {/* Mobile menu trigger */}
+          <button
+            type="button"
+            className="md:hidden text-slate-700 dark:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
+      {/* Mobile Drawer */}
       {mobileOpen && (
-        <div className="md:hidden px-4 pb-4">
-          <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl p-4 space-y-3">
+        <div className="md:hidden px-4 pb-4 animate-page-fade">
+          <div className="bg-white/95 dark:bg-[#111827]/95 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 space-y-2 shadow-xl">
             {navLinks.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
-                className="block text-[#0f172a] font-semibold"
+                className="block text-slate-800 dark:text-slate-200 hover:text-orange-500 dark:hover:text-orange-400 font-semibold px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
                 onClick={() => setMobileOpen(false)}
               >
                 {l.label}
@@ -277,36 +291,36 @@ const Navbar = () => {
               <>
                 <Link
                   to="/dashboard"
-                  className="block text-[#0f172a] font-semibold"
+                  className="block text-slate-800 dark:text-slate-200 hover:text-orange-500 dark:hover:text-orange-400 font-semibold px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
                   Dashboard
                 </Link>
                 <button
                   type="button"
-                  className="block text-[#f97316] font-semibold w-full text-left"
+                  className="block text-rose-600 dark:text-rose-400 font-semibold w-full text-left px-3 py-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
                   onClick={handleLogout}
                 >
                   Logout
                 </button>
               </>
             ) : (
-              <>
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
                 <Link
                   to="/login"
-                  className="block text-[#0f172a] font-semibold"
+                  className="block text-center text-slate-800 dark:text-slate-200 font-semibold px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60"
                   onClick={() => setMobileOpen(false)}
                 >
                   Login
                 </Link>
                 <Link
                   to="/signup"
-                  className="block bg-[#f97316] hover:bg-[#ea6c0a] text-white font-semibold rounded-xl px-4 py-2 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25 text-center"
+                  className="block bg-gradient-to-r from-orange-500 to-amber-600 text-white font-semibold rounded-xl px-4 py-2.5 shadow-md shadow-orange-500/20 text-center"
                   onClick={() => setMobileOpen(false)}
                 >
                   Sign up
                 </Link>
-              </>
+              </div>
             )}
           </div>
         </div>

@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { getThread, sendMessage } from "../api/messages.api";
 import { useAuth } from "../hooks/useAuth.js";
+import { ArrowLeft, Send } from "lucide-react";
 
 // Ensure socket connects to the backend base URL (stripping out /api)
 const rawApiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const SOCKET_URL = rawApiUrl.replace(/\/api\/?$/, "");
 
 const ChatThread = () => {
+  const navigate = useNavigate();
   const { userId } = useParams();
   const { user } = useAuth();
 
@@ -141,34 +143,51 @@ const ChatThread = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto h-[85vh] flex flex-col p-4">
-
+    <div className="max-w-3xl mx-auto h-[86vh] flex flex-col p-4">
       {/* HEADER */}
-      <div className="bg-white/90 dark:bg-[#18181b]/90 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] p-4 rounded-t-3xl shadow-sm flex items-center gap-4 z-10 relative">
-        <div className="relative">
+      <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 p-4 rounded-t-3xl shadow-sm flex items-center gap-3.5 z-10 relative">
+        <button
+          onClick={() => navigate("/messages")}
+          className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          title="Back to messages"
+        >
+          <ArrowLeft size={18} />
+        </button>
+
+        <div className="relative shrink-0">
           <img
             src={otherUser?.avatar || "/default-avatar.svg"}
-            className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+            alt={otherUser?.name || "Student"}
+            className="w-11 h-11 rounded-full object-cover border-2 border-slate-200 dark:border-slate-800"
           />
-          <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${isOnline ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
+          <div
+            className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-[#111827] transition-colors ${
+              isOnline ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"
+            }`}
+          />
         </div>
-        <div className="flex-1">
-          <div className="font-extrabold text-[#0f172a] dark:text-[#f4f4f5] text-lg">
-            {otherUser?.name || "Student"}
+
+        <div className="flex-1 min-w-0">
+          <div className="font-bold text-slate-900 dark:text-white text-base truncate">
+            {otherUser?.name || "Fellow Student"}
           </div>
-          <div className="text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">
-             {isOnline ? "Active now" : "Offline"}
+          <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            {isOnline ? (
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Active now</span>
+            ) : (
+              "Offline"
+            )}
           </div>
         </div>
       </div>
 
       {/* MESSAGES */}
-      <div className="flex-1 overflow-y-auto px-5 py-6 space-y-4 bg-gradient-to-b from-[#f8fafc] to-[#f1f5f9] dark:from-[#121212] dark:to-[#121212] border-x border-[#e2e8f0] dark:border-[#3f3f46]">
-        
+      <div className="flex-1 overflow-y-auto px-5 py-6 space-y-3.5 bg-slate-50/70 dark:bg-[#0b0f19] border-x border-slate-200/80 dark:border-slate-800/80">
         {messages.length === 0 && (
-           <div className="h-full flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] text-sm font-semibold opacity-70">
-             No messages yet. Start the conversation!
-           </div>
+          <div className="h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 text-sm font-medium">
+            <div className="text-3xl mb-2">👋</div>
+            <p>No messages yet. Say hello to arrange item pickup!</p>
+          </div>
         )}
 
         {messages.map((msg) => {
@@ -177,25 +196,27 @@ const ChatThread = () => {
           return (
             <div
               key={msg._id}
-              className={`flex ${isMe ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
+              className={`flex ${isMe ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-1 duration-200`}
             >
               <div
-                className={`px-5 py-2.5 max-w-[70%] shadow-sm flex flex-col ${
+                className={`px-4 py-2.5 max-w-[75%] rounded-2xl shadow-sm flex flex-col text-sm leading-relaxed ${
                   isMe
-                    ? "bg-gradient-to-br from-[#f97316] to-[#ea6c0a] text-white rounded-2xl rounded-tr-sm"
-                    : "bg-white dark:bg-[#1f1f22] border border-[#e2e8f0] dark:border-[#3f3f46] text-[#0f172a] dark:text-[#f4f4f5] rounded-2xl rounded-tl-sm"
+                    ? "bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-tr-xs"
+                    : "bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 text-slate-900 dark:text-white rounded-tl-xs"
                 }`}
               >
-                <div className="text-[15px] leading-relaxed break-words">{msg.text}</div>
+                <div className="break-words">{msg.text}</div>
 
-                <div className="text-[10px] mt-1.5 flex justify-end gap-1 opacity-70 font-semibold tracking-wide">
+                <div
+                  className={`text-[10px] mt-1 flex justify-end gap-1 font-semibold ${
+                    isMe ? "text-orange-100" : "text-slate-400"
+                  }`}
+                >
                   {new Date(msg.timestamp).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
-                  {isMe && (
-                    <span>{msg.read ? "✔✔" : "✔"}</span>
-                  )}
+                  {isMe && <span>{msg.read ? "✓✓" : "✓"}</span>}
                 </div>
               </div>
             </div>
@@ -203,34 +224,37 @@ const ChatThread = () => {
         })}
 
         {isTyping && (
-          <div className="flex justify-start animate-in fade-in duration-300">
-             <div className="bg-white dark:bg-[#1f1f22] border border-[#e2e8f0] dark:border-[#3f3f46] text-[#0f172a] dark:text-[#f4f4f5] rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center gap-1.5">
-               <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: "0ms"}}></div>
-               <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: "150ms"}}></div>
-               <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: "300ms"}}></div>
-             </div>
+          <div className="flex justify-start animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl rounded-tl-xs px-4 py-3 shadow-sm flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+              <div className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+              <div className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+            </div>
           </div>
         )}
 
-        <div ref={bottomRef} className="h-2"></div>
+        <div ref={bottomRef} className="h-1" />
       </div>
 
       {/* INPUT */}
-      <div className="bg-white/90 dark:bg-[#18181b]/90 backdrop-blur-md border border-[#e2e8f0] dark:border-[#3f3f46] p-3 rounded-b-3xl flex gap-3 z-10 relative">
+      <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 p-3 rounded-b-3xl flex gap-2.5 z-10 relative shadow-sm">
         <input
           value={text}
           onChange={handleTyping}
-          onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
-          placeholder="Message..."
-          className="flex-1 bg-[#f8fafc] dark:bg-[#1f1f22] border border-[#cbd5e1] rounded-2xl px-5 py-3 outline-none focus:ring-2 focus:ring-[#f97316]/50 transition-all font-medium text-[#0f172a] dark:text-[#f4f4f5]"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSend();
+          }}
+          placeholder="Type a message..."
+          className="flex-1 bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all text-sm font-medium text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
         />
 
         <button
           onClick={handleSend}
           disabled={!text.trim()}
-          className="bg-[#f97316] hover:bg-[#ea6c0a] disabled:opacity-50 disabled:hover:bg-[#f97316] disabled:cursor-not-allowed text-white px-6 py-3 rounded-2xl font-extrabold transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/30 flex items-center justify-center"
+          className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-5 py-3 rounded-2xl font-bold transition-all duration-200 shadow-md shadow-orange-500/20 flex items-center justify-center gap-1.5 text-sm"
         >
-          Send
+          <span>Send</span>
+          <Send size={15} />
         </button>
       </div>
     </div>

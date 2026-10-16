@@ -27,63 +27,83 @@ const pickupZones = [
 
 const FeaturedItemCard = ({ it, onOpen }) => {
   return (
-    <button
-      type="button"
+    <div
       onClick={onOpen}
-      className="text-left rounded-2xl bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] p-4 shadow-md hover:scale-[1.02] hover:shadow-xl hover:border-[#f97316]/50 hover:ring-2 hover:ring-[#f97316]/20 transition-all duration-200"
+      className="text-left rounded-2xl bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 hover:border-orange-500/40 dark:hover:border-orange-500/40 p-3.5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col group"
     >
-      <div className="aspect-square rounded-xl overflow-hidden bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46]">
+      <div className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
         {it.images?.[0] ? (
           <img
             src={it.images[0]}
             alt={it.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] text-sm">
+          <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
             No image
+          </div>
+        )}
+
+        <div className="absolute top-2 left-2 flex gap-1 flex-wrap">
+          <span
+            className={
+              "px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm " +
+              (it.listingType === "Rent"
+                ? "bg-orange-500 text-white"
+                : "bg-emerald-600 text-white")
+            }
+          >
+            {it.listingType === "Rent" ? "Rent" : "Exchange"}
+          </span>
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-black/60 backdrop-blur-md text-white">
+            {it.condition}
+          </span>
+        </div>
+
+        {it.pickupLocation && (
+          <div className="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-white text-[10px]">
+            <span className="text-orange-400">📍</span>
+            <span>{it.pickupLocation}</span>
           </div>
         )}
       </div>
 
-      <div className="mt-3 flex gap-2 flex-wrap">
-        <span
-          className={
-            "px-2 py-1 rounded-full text-xs font-semibold border " +
-            (it.listingType === "Rent"
-              ? "bg-orange-100 text-orange-700 border-orange-200"
-              : "bg-green-100 text-green-700 border-green-200")
-          }
-        >
-          {it.listingType === "Rent" ? "Rent" : "Exchange"}
-        </span>
-        <span className="px-2 py-1 rounded-full text-xs font-semibold bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] border border-white/40 dark:border-[#3f3f46]">
-          {it.condition}
-        </span>
-      </div>
-
-      <div className="mt-3 font-extrabold text-[#0f172a] dark:text-[#f4f4f5] leading-tight">
-        {it.title}
-      </div>
-
-      <div className="mt-2 text-sm text-[#64748b] dark:text-[#a1a1aa]">
-        {it.listingType === "Exchange" || it.price === 0 ? (
-          <span className="font-semibold text-[#0f172a] dark:text-[#f4f4f5]">Free Exchange</span>
-        ) : (
-          <span className="font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
-            ₹{it.price}/day
-          </span>
-        )}
-      </div>
-      {it.originalPrice && it.originalPrice > 0 && (
-        <div className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-1">
-          <span className="line-through">₹{it.originalPrice}</span>
+      <div className="mt-3 space-y-1 flex-1 flex flex-col justify-between">
+        <div>
+          <div className="text-[10px] font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400">
+            {it.category}
+          </div>
+          <div className="font-bold text-slate-900 dark:text-white text-sm leading-snug line-clamp-1 group-hover:text-orange-500 transition-colors">
+            {it.title}
+          </div>
         </div>
-      )}
-      <div className="text-xs text-[#64748b] dark:text-[#a1a1aa] mt-2">
-        Listed {it.createdAt ? Math.max(1, Math.floor((Date.now() - new Date(it.createdAt)) / 86400000)) : 0} day(s) ago
+
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+          <div>
+            {it.listingType === "Exchange" || Number(it.price) === 0 ? (
+              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                Free Exchange
+              </span>
+            ) : (
+              <div className="flex items-baseline gap-1">
+                <span className="text-base font-extrabold text-slate-900 dark:text-white">
+                  ₹{it.price}
+                </span>
+                <span className="text-[10px] text-slate-400">/day</span>
+                {it.originalPrice && it.originalPrice > 0 ? (
+                  <span className="text-[10px] text-slate-400 line-through ml-1">
+                    ₹{it.originalPrice}
+                  </span>
+                ) : null}
+              </div>
+            )}
+          </div>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500">
+            {it.createdAt ? Math.max(1, Math.floor((Date.now() - new Date(it.createdAt)) / 86400000)) : 0}d ago
+          </span>
+        </div>
       </div>
-    </button>
+    </div>
   );
 };
 
@@ -222,214 +242,198 @@ const Browse = () => {
   };
 
   return (
-    <div className="w-full">
-      <section className="max-w-6xl mx-auto px-4 pt-6">
-        <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-4 sticky top-[72px] z-10">
-          <div className="flex items-center gap-3">
-            <input
-              className="flex-1 border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
-              placeholder="Search items, descriptions, tags..."
-              value={query.search}
-              onChange={(e) => setQuery((q) => ({ ...q, search: e.target.value, page: 1 }))}
-            />
+    <div className="w-full pb-16">
+      <section className="max-w-6xl mx-auto px-4 pt-4 sm:pt-6">
+        {/* Sticky search and active filter bar */}
+        <div className="bg-white/90 dark:bg-[#111827]/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-sm p-3.5 sticky top-[64px] z-20">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex-1 flex items-center bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-2 text-sm">
+              <span className="text-slate-400 mr-2">🔍</span>
+              <input
+                className="w-full bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 outline-none text-sm"
+                placeholder="Search items, descriptions, tags (e.g. keyboard, textbook, cycle)..."
+                value={query.search}
+                onChange={(e) => setQuery((q) => ({ ...q, search: e.target.value, page: 1 }))}
+              />
+            </div>
             <button
               type="button"
               onClick={clearAll}
-              className="bg-white dark:bg-[#1f1f22] hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/20 dark:hover:border-red-900/50 text-[#ef4444] font-semibold rounded-xl px-4 py-2 border border-gray-200 dark:border-[#3f3f46] shadow-sm hover:shadow-md transition-all duration-200"
+              className="bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/30 text-slate-600 hover:text-rose-600 dark:text-slate-300 dark:hover:text-rose-400 font-semibold text-xs rounded-xl px-3.5 py-2.5 transition-colors shrink-0"
             >
-              Clear
+              Reset
             </button>
           </div>
 
           {activeChips.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-3 flex flex-wrap gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800/80">
               {activeChips.map((c) => (
                 <button
                   key={c.key}
                   type="button"
-                  className="bg-white dark:bg-[#1f1f22] border border-gray-200 dark:border-[#3f3f46] shadow-sm hover:shadow-md hover:-translate-y-0.5 rounded-full px-4 py-1.5 text-xs font-semibold text-[#0f172a] dark:text-[#f4f4f5] hover:border-gray-300 dark:hover:border-gray-500 transition-all cursor-pointer flex items-center justify-center gap-1"
                   onClick={() => removeChip(c.key)}
+                  className="bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/20 rounded-full px-3 py-1 text-xs font-semibold flex items-center gap-1 transition-colors"
                 >
-                  {c.label} <span className="opacity-60 hover:opacity-100 font-bold ml-0.5">×</span>
+                  <span>{c.label}</span>
+                  <span className="font-bold opacity-60 hover:opacity-100">×</span>
                 </button>
               ))}
             </div>
           )}
         </div>
 
-        <div className="mt-6 grid md:grid-cols-3 gap-5">
-          <aside className="md:block hidden">
-            <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-4">
-              <h3 className="font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">Filters</h3>
+        {/* Content area: Sidebar + Item Grid */}
+        <div className="mt-6 grid md:grid-cols-12 gap-6 items-start">
+          {/* Filters Sidebar */}
+          <aside className="md:col-span-4 lg:col-span-3 space-y-4">
+            <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                <h3 className="font-bold text-slate-900 dark:text-white text-sm">Filters</h3>
+                <span className="text-[11px] font-semibold text-slate-400">Refine Results</span>
+              </div>
 
-              <div className="mt-4 space-y-4">
-                <div>
-                  <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5] mb-2">
-                    Category
-                  </div>
-                  <select
-                    className="w-full border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
-                    value={query.category}
-                    onChange={(e) =>
-                      setQuery((q) => ({
-                        ...q,
-                        category: e.target.value,
-                        page: 1,
-                      }))
-                    }
-                  >
-                    <option value="">All</option>
-                    {categories.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
+                  Category
+                </label>
+                <select
+                  className="w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500/40"
+                  value={query.category}
+                  onChange={(e) => setQuery((q) => ({ ...q, category: e.target.value, page: 1 }))}
+                >
+                  <option value="">All Categories</option>
+                  {categories.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
 
-                <div>
-                  <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5] mb-2">
-                    Condition
-                  </div>
-                  <select
-                    className="w-full border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
-                    value={query.condition}
-                    onChange={(e) =>
-                      setQuery((q) => ({
-                        ...q,
-                        condition: e.target.value,
-                        page: 1,
-                      }))
-                    }
-                  >
-                    <option value="">All</option>
-                    {conditions.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
+                  Condition
+                </label>
+                <select
+                  className="w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500/40"
+                  value={query.condition}
+                  onChange={(e) => setQuery((q) => ({ ...q, condition: e.target.value, page: 1 }))}
+                >
+                  <option value="">Any Condition</option>
+                  {conditions.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
 
-                <div>
-                  <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5] mb-2">
-                    Listing type
-                  </div>
-                  <select
-                    className="w-full border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
-                    value={query.listingType}
-                    onChange={(e) =>
-                      setQuery((q) => ({
-                        ...q,
-                        listingType: e.target.value,
-                        page: 1,
-                      }))
-                    }
-                  >
-                    <option value="">All</option>
-                    {listingTypes.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
+                  Listing Type
+                </label>
+                <select
+                  className="w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500/40"
+                  value={query.listingType}
+                  onChange={(e) => setQuery((q) => ({ ...q, listingType: e.target.value, page: 1 }))}
+                >
+                  <option value="">All Types</option>
+                  {listingTypes.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
 
-                <div>
-                  <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5] mb-2">
-                    Pickup location
-                  </div>
-                  <select
-                    className="w-full border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
-                    value={query.pickupLocation}
-                    onChange={(e) =>
-                      setQuery((q) => ({
-                        ...q,
-                        pickupLocation: e.target.value,
-                        page: 1,
-                      }))
-                    }
-                  >
-                    <option value="">Any</option>
-                    {pickupZones.map((z) => (
-                      <option key={z} value={z}>
-                        {z}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
+                  Campus Pickup Zone
+                </label>
+                <select
+                  className="w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500/40"
+                  value={query.pickupLocation}
+                  onChange={(e) => setQuery((q) => ({ ...q, pickupLocation: e.target.value, page: 1 }))}
+                >
+                  <option value="">Any Pickup Zone</option>
+                  {pickupZones.map((z) => (
+                    <option key={z} value={z}>{z}</option>
+                  ))}
+                </select>
+              </div>
 
-                <div>
-                  <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5] mb-2">
-                    Price range (per day)
-                  </div>
-                  <div className="flex gap-2">
-                    <input
-                      className="w-1/2 border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
-                      placeholder="Min"
-                      value={query.minPrice}
-                      onChange={(e) =>
-                        setQuery((q) => ({ ...q, minPrice: e.target.value, page: 1 }))
-                      }
-                    />
-                    <input
-                      className="w-1/2 border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
-                      placeholder="Max"
-                      value={query.maxPrice}
-                      onChange={(e) =>
-                        setQuery((q) => ({ ...q, maxPrice: e.target.value, page: 1 }))
-                      }
-                    />
-                  </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
+                  Daily Rate (₹)
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="Min"
+                    value={query.minPrice}
+                    onChange={(e) => setQuery((q) => ({ ...q, minPrice: e.target.value, page: 1 }))}
+                    className="w-1/2 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500/40"
+                  />
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="Max"
+                    value={query.maxPrice}
+                    onChange={(e) => setQuery((q) => ({ ...q, maxPrice: e.target.value, page: 1 }))}
+                    className="w-1/2 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500/40"
+                  />
                 </div>
+              </div>
 
-                <div>
-                  <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5] mb-2">
-                    Sort
-                  </div>
-                  <select
-                    className="w-full border border-gray-300 dark:border-[#3f3f46] bg-white dark:bg-[#1f1f22] rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316] shadow-sm transition-shadow"
-                    value={query.sort}
-                    onChange={(e) =>
-                      setQuery((q) => ({
-                        ...q,
-                        sort: e.target.value,
-                        page: 1,
-                      }))
-                    }
-                  >
-                    <option value="newest">Newest</option>
-                    <option value="price_asc">Price (low → high)</option>
-                    <option value="top_rated">Top rated</option>
-                  </select>
-                </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
+                  Sort Order
+                </label>
+                <select
+                  className="w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500/40"
+                  value={query.sort}
+                  onChange={(e) => setQuery((q) => ({ ...q, sort: e.target.value, page: 1 }))}
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="price_asc">Price: Low to High</option>
+                  <option value="price_desc">Price: High to Low</option>
+                  <option value="top_rated">Top Rated</option>
+                </select>
               </div>
             </div>
           </aside>
 
-          <div className="md:col-span-2">
+          {/* Results Grid */}
+          <div className="md:col-span-8 lg:col-span-9">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl p-4 font-semibold">
+              <div className="bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 text-rose-700 dark:text-rose-400 rounded-2xl p-4 text-xs font-semibold mb-4">
                 {error}
               </div>
             )}
 
             {pending ? (
-              <div className="mt-2 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Array.from({ length: 9 }).map((_, i) => (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={i}
-                    className="rounded-2xl bg-white/60 border border-white/40 h-[320px] animate-pulse"
+                    className="rounded-2xl bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 h-72 animate-pulse"
                   />
                 ))}
               </div>
             ) : results.length === 0 ? (
-              <div className="mt-2 bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl p-6 text-[#64748b]">
-                No items match your filters. Try removing some filters or
-                searching something else.
+              <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-12 text-center space-y-3">
+                <div className="text-3xl">🎒</div>
+                <h4 className="font-bold text-slate-900 dark:text-white text-base">
+                  No listings found
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                  Try clearing some filters, widening the price range, or searching for broader terms.
+                </p>
+                <button
+                  type="button"
+                  onClick={clearAll}
+                  className="bg-orange-500 text-white text-xs font-semibold px-4 py-2 rounded-xl"
+                >
+                  Clear All Filters
+                </button>
               </div>
             ) : (
-              <div className="mt-2 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {results.map((it) => (
                   <FeaturedItemCard
                     key={it._id}
@@ -440,32 +444,35 @@ const Browse = () => {
               </div>
             )}
 
-            <div className="mt-6 flex items-center justify-between">
-              <div className="text-sm text-[#64748b]">
-                {totalCount} results
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  disabled={(query.page || 1) <= 1}
-                  onClick={() => setQuery((q) => ({ ...q, page: Math.max((q.page || 1) - 1, 1) }))}
-                  className="px-4 py-2 rounded-xl bg-white/80 border border-white/40 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Prev
-                </button>
-                <div className="text-sm font-semibold text-[#0f172a]">
-                  Page {query.page || 1} of {totalPages}
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex items-center justify-between border-t border-slate-200/60 dark:border-slate-800/60 pt-4">
+                <div className="text-xs text-slate-500 dark:text-slate-400">
+                  Showing <span className="font-bold text-slate-900 dark:text-white">{results.length}</span> of <span className="font-bold text-slate-900 dark:text-white">{totalCount}</span> items
                 </div>
-                <button
-                  type="button"
-                  disabled={(query.page || 1) >= totalPages}
-                  onClick={() => setQuery((q) => ({ ...q, page: Math.min((q.page || 1) + 1, totalPages) }))}
-                  className="px-4 py-2 rounded-xl bg-white/80 border border-white/40 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={(query.page || 1) <= 1}
+                    onClick={() => setQuery((q) => ({ ...q, page: Math.max((q.page || 1) - 1, 1) }))}
+                    className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-700"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 px-2">
+                    {query.page || 1} / {totalPages}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={(query.page || 1) >= totalPages}
+                    onClick={() => setQuery((q) => ({ ...q, page: Math.min((q.page || 1) + 1, totalPages) }))}
+                    className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-700"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </section>

@@ -60,24 +60,31 @@ const ChatList = () => {
 
   if (loading) {
     return (
-       <div className="max-w-3xl mx-auto p-6 space-y-4">
-         <div className="h-8 w-32 bg-gray-200 animate-pulse rounded-lg mb-6"></div>
-         {[...Array(4)].map((_, i) => (
-             <div key={i} className="h-20 bg-gray-200 animate-pulse rounded-2xl w-full"></div>
-         ))}
-       </div>
+      <div className="max-w-3xl mx-auto px-4 py-8 space-y-4 animate-pulse">
+        <div className="h-8 w-44 bg-slate-200 dark:bg-slate-800 rounded-xl mb-6" />
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-20 bg-slate-200 dark:bg-slate-800/60 rounded-2xl w-full" />
+        ))}
+      </div>
     );
   }
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5] mb-6">Messages</h1>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Messages</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Direct campus communication</p>
+        </div>
+      </div>
 
       {conversations.length === 0 ? (
-        <div className="bg-white/80 dark:bg-[#1e1e1e]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] p-10 rounded-3xl text-center shadow-sm">
-          <div className="text-4xl mb-4">💬</div>
-          <div className="text-lg font-bold text-[#0f172a] dark:text-[#f4f4f5]">No conversations yet</div>
-          <div className="text-[#64748b] mt-2">Start a conversation by messaging an item owner!</div>
+        <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 p-12 rounded-3xl text-center shadow-sm">
+          <div className="text-4xl mb-3">💬</div>
+          <div className="text-lg font-bold text-slate-900 dark:text-white">No conversations yet</div>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
+            Find items in the browse catalog and message owners directly to arrange handovers!
+          </p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -87,27 +94,45 @@ const ChatList = () => {
               <div
                 key={c.otherUser._id}
                 onClick={() => navigate(`/chat/${c.otherUser._id}`)}
-                className="p-4 bg-white/90 dark:bg-[#18181b]/90 backdrop-blur-md border border-[#e2e8f0] dark:border-[#3f3f46] rounded-2xl cursor-pointer hover:scale-[1.01] hover:-translate-y-0.5 hover:shadow-xl transition-all duration-300 flex items-center gap-4 group"
+                className="p-4 bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl cursor-pointer hover:border-orange-500/40 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 flex items-center gap-4 group"
               >
-                <div className="relative">
+                <div className="relative shrink-0">
                   <img
                     src={c.otherUser.avatar || "/default-avatar.svg"}
-                    className="w-14 h-14 rounded-full object-cover border-2 border-white dark:border-[#3f3f46] shadow-sm transition-transform duration-300 group-hover:scale-105"
+                    alt={c.otherUser.name}
+                    className="w-13 h-13 rounded-full object-cover border-2 border-slate-200 dark:border-slate-800 group-hover:scale-105 transition-transform"
                   />
-                  <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-[#3f3f46] transition-colors duration-500 ${isOnline ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
+                  <div
+                    className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-[#111827] transition-colors ${
+                      isOnline ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"
+                    }`}
+                    title={isOnline ? "Active now" : "Offline"}
+                  />
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <div className="font-extrabold text-[#0f172a] dark:text-[#f4f4f5] text-lg flex items-center gap-2">
-                    {c.otherUser.name}
+                  <div className="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2 group-hover:text-orange-500 transition-colors">
+                    <span className="truncate">{c.otherUser.name}</span>
+                    {isOnline && (
+                      <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                        Online
+                      </span>
+                    )}
                   </div>
-                  <div className={`text-[15px] truncate mt-0.5 ${c.unreadCount > 0 ? 'text-[#0f172a] dark:text-[#f4f4f5] font-bold' : 'text-[#64748b] dark:text-[#a1a1aa] font-medium'}`}>
-                    {c.lastMessage.sender === user.id ? 'You: ' : ''}{c.lastMessage.text}
+                  <div
+                    className={`text-sm truncate mt-0.5 ${
+                      c.unreadCount > 0
+                        ? "text-slate-900 dark:text-white font-bold"
+                        : "text-slate-500 dark:text-slate-400 font-normal"
+                    }`}
+                  >
+                    {c.lastMessage.sender === user.id ? "You: " : ""}
+                    {c.lastMessage.text}
                   </div>
                 </div>
 
-                <div className="text-right flex flex-col items-end gap-1">
-                  <div className="text-xs font-semibold text-[#64748b] dark:text-[#a1a1aa]">
+                <div className="text-right flex flex-col items-end gap-1 shrink-0">
+                  <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
                     {new Date(c.lastMessage.timestamp).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -115,7 +140,7 @@ const ChatList = () => {
                   </div>
 
                   {c.unreadCount > 0 && (
-                    <span className="bg-gradient-to-br from-[#f97316] to-[#ea6c0a] text-white px-2 py-0.5 rounded-full text-xs font-bold shadow-sm">
+                    <span className="bg-gradient-to-r from-orange-500 to-amber-600 text-white px-2 py-0.5 rounded-full text-[10px] font-black shadow-sm">
                       {c.unreadCount} NEW
                     </span>
                   )}

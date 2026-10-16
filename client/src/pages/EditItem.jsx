@@ -64,11 +64,11 @@ const EditItem = () => {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-10 w-full">
-        <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6">
-          <div className="h-8 bg-white/60 dark:bg-[#27272a] border border-white/40 dark:border-[#3f3f46] rounded-xl animate-pulse" />
-          <div className="mt-4 h-6 bg-white/60 dark:bg-[#27272a] border border-white/40 dark:border-[#3f3f46] rounded-xl animate-pulse" />
-          <div className="mt-4 h-36 bg-white/60 dark:bg-[#27272a] border border-white/40 dark:border-[#3f3f46] rounded-2xl animate-pulse" />
+      <div className="max-w-2xl mx-auto px-4 py-10 w-full">
+        <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-8 space-y-4 shadow-sm animate-pulse">
+          <div className="h-8 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+          <div className="h-6 bg-slate-200 dark:bg-slate-800 rounded-xl w-3/4" />
+          <div className="h-40 bg-slate-200 dark:bg-slate-800 rounded-2xl" />
         </div>
       </div>
     );
@@ -76,8 +76,8 @@ const EditItem = () => {
 
   if (error) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-10 w-full">
-        <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6 text-[#ef4444] font-semibold">
+      <div className="max-w-2xl mx-auto px-4 py-10 w-full">
+        <div className="bg-white dark:bg-[#111827] border border-rose-200 dark:border-rose-900/60 rounded-3xl p-6 text-rose-500 font-semibold shadow-sm">
           {error}
         </div>
       </div>
@@ -86,9 +86,9 @@ const EditItem = () => {
 
   if (!initialValues) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-10 w-full">
-        <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6 text-[#64748b] dark:text-[#a1a1aa] font-semibold">
-          Item not found.
+      <div className="max-w-2xl mx-auto px-4 py-10 w-full">
+        <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-8 text-center text-slate-500 dark:text-slate-400 font-medium shadow-sm">
+          Item not found or already deleted.
         </div>
       </div>
     );
