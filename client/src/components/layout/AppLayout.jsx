@@ -7,8 +7,8 @@ const AppLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Hide FAB on Login/Signup pages
-  const hideFAB = ["/login", "/signup"].includes(location.pathname);
+  // Hide FAB on Login/Signup and Chat pages
+  const hideFAB = ["/login", "/signup"].includes(location.pathname) || location.pathname.startsWith("/chat");
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col transition-colors duration-300 relative">
       {/* Ambient background glow */}

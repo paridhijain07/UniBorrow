@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Bell, Menu, Moon, Sun } from "lucide-react";
+import { Bell, Menu, MessageSquare, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import logo from "../../assets/logo.png";
@@ -138,6 +138,17 @@ const Navbar = () => {
           
           {isAuthed ? (
             <>
+              {/* Messages Shortcut */}
+              <button
+                type="button"
+                onClick={() => navigate("/chat")}
+                className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative"
+                aria-label="Messages"
+                title="Messages"
+              >
+                <MessageSquare className="w-4 h-4" />
+              </button>
+
               {/* Notifications Popover */}
               <div className="relative">
                 <button
@@ -289,6 +300,13 @@ const Navbar = () => {
             ))}
             {isAuthed ? (
               <>
+                <Link
+                  to="/chat"
+                  className="block text-slate-800 dark:text-slate-200 hover:text-orange-500 dark:hover:text-orange-400 font-semibold px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Messages
+                </Link>
                 <Link
                   to="/dashboard"
                   className="block text-slate-800 dark:text-slate-200 hover:text-orange-500 dark:hover:text-orange-400 font-semibold px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"

@@ -15,8 +15,7 @@ const ItemDetail = lazy(() => import("./pages/ItemDetail.jsx"));
 const AddItem = lazy(() => import("./pages/AddItem.jsx"));
 const EditItem = lazy(() => import("./pages/EditItem.jsx"));
 const Bookings = lazy(() => import("./pages/Bookings.jsx"));
-const ChatList = lazy(() => import("./pages/ChatList.jsx"));
-const ChatThread = lazy(() => import("./pages/ChatThread.jsx"));
+const ChatPage = lazy(() => import("./pages/ChatPage.jsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.jsx"));
 const Notifications = lazy(() => import("./pages/Notifications.jsx"));
 const Profile = lazy(() => import("./pages/Profile.jsx"));
@@ -44,8 +43,8 @@ const App = () => {
             <Route path="/edit-item/:id" element={<EditItem />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/bookings" element={<Bookings />} />
-            <Route path="/chat" element={<ChatList />} />
-            <Route path="/chat/:userId" element={<ChatThread />} />
+            <Route path="/chat" element={<ChatPage />} />
+            <Route path="/chat/:userId" element={<ChatPage />} />
             <Route path="/notifications" element={<Notifications />} />
           </Route>
           <Route element={<AdminRoute />}>
