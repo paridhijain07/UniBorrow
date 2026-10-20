@@ -28,5 +28,9 @@ const BookingSchema = new mongoose.Schema(
   { timestamps: false }
 );
 
+BookingSchema.index({ item: 1, status: 1, startDate: 1, endDate: 1 });
+BookingSchema.index({ borrower: 1, createdAt: -1 });
+BookingSchema.index({ owner: 1, createdAt: -1 });
+
 module.exports = mongoose.model("Booking", BookingSchema);
 

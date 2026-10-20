@@ -22,8 +22,9 @@ export const useItem = (itemId) => {
         if (!alive) return;
         setError(err?.response?.data?.message || err?.message || "Failed");
       } finally {
-        if (!alive) return;
-        setLoading(false);
+        if (alive) {
+          setLoading(false);
+        }
       }
     };
 

@@ -16,12 +16,7 @@ const auth = (req, res, next) => {
         message: "Unauthorized: missing token",
       });
     }
-    const admin = (req, res, next) => {
-  if (req.user.role !== "admin") {
-    return res.status(403).json({ message: "Access denied" });
-  }
-  next();
-};
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     return next();
@@ -33,5 +28,17 @@ const auth = (req, res, next) => {
   }
 };
 
+const admin = (req, res, next) => {
+  if (!req.user || req.user.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Access denied: Admin privileges required",
+    });
+  }
+  return next();
+};
+
 module.exports = auth;
+module.exports.auth = auth;
+module.exports.admin = admin;
 

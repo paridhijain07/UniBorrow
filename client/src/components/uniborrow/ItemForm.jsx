@@ -147,66 +147,82 @@ const ItemForm = ({
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 w-full">
-      <div className="mb-5">
-        <div className="h-2 bg-white/40 rounded-full overflow-hidden">
-          <div className="h-full bg-[#f97316] transition-all duration-300" style={{ width: progressWidth }} />
+    <div className="max-w-2xl mx-auto px-4 py-8 w-full">
+      {/* STEP PROGRESS BAR */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400 mb-2">
+          <span className={step >= 1 ? "text-orange-500 font-extrabold" : ""}>1. Item Basics</span>
+          <span className={step >= 2 ? "text-orange-500 font-extrabold" : ""}>2. Pricing & Info</span>
+          <span className={step >= 3 ? "text-orange-500 font-extrabold" : ""}>3. Images & Location</span>
+          <span className={step >= 4 ? "text-orange-500 font-extrabold" : ""}>4. Review</span>
         </div>
-        <div className="mt-3 flex items-center justify-between text-sm font-semibold text-[#64748b]">
-          <span>Step 1</span>
-          <span>Step 2</span>
-          <span>Step 3</span>
-          <span>Step 4</span>
+        <div className="h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-orange-500 to-amber-600 transition-all duration-300"
+            style={{ width: progressWidth }}
+          />
         </div>
       </div>
 
-      <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-md p-6">
+      <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 rounded-3xl shadow-sm p-6 sm:p-8">
         {step === 1 && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">Title</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Listing Title
+              </label>
               <input
-                className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm"
                 value={values.title}
                 onChange={(e) => setValues((v) => ({ ...v, title: e.target.value }))}
-                placeholder="e.g., Mechanical Keyboard"
+                placeholder="e.g., TI-84 Plus Calculator / Wireless Noise-Cancelling Headphones"
               />
-              {errors.title && <div className="text-sm text-[#ef4444] font-semibold mt-1">{errors.title}</div>}
+              {errors.title && <div className="text-xs text-rose-500 font-semibold mt-1">{errors.title}</div>}
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-[#0f172a]">Category</label>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                  Category
+                </label>
                 <select
-                  className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                  className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all text-sm"
                   value={values.category}
                   onChange={(e) => setValues((v) => ({ ...v, category: e.target.value }))}
                 >
                   {categories.map((c) => (
-                    <option value={c} key={c}>{c}</option>
+                    <option value={c} key={c} className="bg-white dark:bg-[#111827] text-slate-900 dark:text-white">
+                      {c}
+                    </option>
                   ))}
                 </select>
-                {errors.category && <div className="text-sm text-[#ef4444] font-semibold mt-1">{errors.category}</div>}
+                {errors.category && <div className="text-xs text-rose-500 font-semibold mt-1">{errors.category}</div>}
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-[#0f172a]">Condition</label>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                  Condition
+                </label>
                 <select
-                  className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                  className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all text-sm"
                   value={values.condition}
                   onChange={(e) => setValues((v) => ({ ...v, condition: e.target.value }))}
                 >
                   {conditions.map((c) => (
-                    <option value={c} key={c}>{c}</option>
+                    <option value={c} key={c} className="bg-white dark:bg-[#111827] text-slate-900 dark:text-white">
+                      {c}
+                    </option>
                   ))}
                 </select>
-                {errors.condition && <div className="text-sm text-[#ef4444] font-semibold mt-1">{errors.condition}</div>}
+                {errors.condition && <div className="text-xs text-rose-500 font-semibold mt-1">{errors.condition}</div>}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">Listing type</label>
-              <div className="mt-2 flex flex-wrap gap-2">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                Listing Type
+              </label>
+              <div className="flex gap-3">
                 {listingTypes.map((t) => {
                   const active = values.listingType === t;
                   return (
@@ -222,178 +238,186 @@ const ItemForm = ({
                         setErrors({});
                       }}
                       className={
-                        "px-4 py-2 rounded-xl border font-semibold text-sm transition-all duration-200 " +
+                        "flex-1 py-3 px-4 rounded-xl border text-sm font-bold transition-all duration-200 " +
                         (active
-                          ? "bg-[#f97316] text-white border-[#f97316]"
-                          : "bg-white/60 text-[#0f172a] border-white/40 hover:bg-white/80")
+                          ? "bg-gradient-to-r from-orange-500 to-amber-600 text-white border-transparent shadow-md shadow-orange-500/20"
+                          : "bg-slate-50 dark:bg-[#1a2234] text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700")
                       }
                     >
-                      {t}
+                      {t === "Rent" ? "Borrow / Rent (₹/day)" : "Free Exchange"}
                     </button>
                   );
                 })}
               </div>
-              {errors.listingType && <div className="text-sm text-[#ef4444] font-semibold mt-1">{errors.listingType}</div>}
+              {errors.listingType && <div className="text-xs text-rose-500 font-semibold mt-1">{errors.listingType}</div>}
             </div>
           </div>
         )}
 
         {step === 2 && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-[#0f172a]">
-                  Price / day {values.listingType === "Rent" ? "" : "(Exchange = 0)"}
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                  Rental Price (₹ / day) {values.listingType !== "Rent" && "(Free for Exchange)"}
                 </label>
                 <input
                   type="number"
                   min={0}
-                  className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                  className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all text-sm disabled:opacity-50"
                   value={values.price}
                   onChange={(e) => setValues((v) => ({ ...v, price: e.target.value }))}
                   disabled={values.listingType !== "Rent"}
                 />
-                {errors.price && <div className="text-sm text-[#ef4444] font-semibold mt-1">{errors.price}</div>}
+                {errors.price && <div className="text-xs text-rose-500 font-semibold mt-1">{errors.price}</div>}
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-[#0f172a]">
-                  Original price
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                  Estimated Retail Value (₹)
                 </label>
                 <input
                   type="number"
                   min={0}
-                  className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                  className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all text-sm"
                   value={values.originalPrice}
                   onChange={(e) => setValues((v) => ({ ...v, originalPrice: e.target.value }))}
+                  placeholder="Optional retail price"
                 />
-                {errors.originalPrice && <div className="text-sm text-[#ef4444] font-semibold mt-1">{errors.originalPrice}</div>}
+                {errors.originalPrice && <div className="text-xs text-rose-500 font-semibold mt-1">{errors.originalPrice}</div>}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">Description</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Item Description
+              </label>
               <textarea
                 rows={5}
-                className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm leading-relaxed"
                 value={values.description}
                 onChange={(e) => setValues((v) => ({ ...v, description: e.target.value }))}
-                placeholder="Describe condition, accessories, what’s included..."
+                placeholder="Mention condition, accessories included, charging cables, user manuals..."
               />
-              {errors.description && <div className="text-sm text-[#ef4444] font-semibold mt-1">{errors.description}</div>}
+              {errors.description && <div className="text-xs text-rose-500 font-semibold mt-1">{errors.description}</div>}
             </div>
           </div>
         )}
 
         {step === 3 && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">Image URLs (max 3)</label>
-              <div className="mt-3 space-y-3">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Image URLs (Add up to 3 links)
+              </label>
+              <div className="space-y-2.5">
                 {[0, 1, 2].map((idx) => (
                   <input
                     key={idx}
-                    className="w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                    className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm"
                     value={values.images[idx] || ""}
                     onChange={(e) => {
                       const next = [...values.images];
                       next[idx] = e.target.value;
                       setValues((v) => ({ ...v, images: next }));
                     }}
-                    placeholder={`Image URL ${idx + 1}`}
+                    placeholder={`https://images.unsplash.com/... (Image URL #${idx + 1})`}
                   />
                 ))}
               </div>
-              {errors.images && <div className="text-sm text-[#ef4444] font-semibold mt-1">{errors.images}</div>}
+              {errors.images && <div className="text-xs text-rose-500 font-semibold mt-1">{errors.images}</div>}
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">Tags (comma-separated)</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Tags (Comma-separated)
+              </label>
               <input
-                className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm"
                 value={values.tagsText}
                 onChange={(e) => setValues((v) => ({ ...v, tagsText: e.target.value }))}
-                placeholder="keyboard, mechanical, electronics"
+                placeholder="engineering, electronics, semester-3, calculator"
               />
-              {errors.tagsText && <div className="text-sm text-[#ef4444] font-semibold mt-1">{errors.tagsText}</div>}
+              {errors.tagsText && <div className="text-xs text-rose-500 font-semibold mt-1">{errors.tagsText}</div>}
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">Pickup location</label>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Campus Pickup Location
+              </label>
               <select
-                className="mt-1 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
+                className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all text-sm"
                 value={values.pickupLocation}
                 onChange={(e) => setValues((v) => ({ ...v, pickupLocation: e.target.value }))}
               >
                 {pickupZones.map((z) => (
-                  <option value={z} key={z}>{z}</option>
+                  <option value={z} key={z} className="bg-white dark:bg-[#111827] text-slate-900 dark:text-white">
+                    {z} Safe Pickup Zone
+                  </option>
                 ))}
               </select>
-              {errors.pickupLocation && <div className="text-sm text-[#ef4444] font-semibold mt-1">{errors.pickupLocation}</div>}
+              {errors.pickupLocation && <div className="text-xs text-rose-500 font-semibold mt-1">{errors.pickupLocation}</div>}
             </div>
           </div>
         )}
 
         {step === 4 && (
-          <div className="space-y-4">
-            <h3 className="text-xl font-extrabold text-[#0f172a]">Preview</h3>
+          <div className="space-y-5">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Review Your Listing</h3>
 
-            <div className="rounded-2xl border border-white/40 bg-white/60 p-4">
-              <div className="font-extrabold text-[#0f172a] text-lg">{values.title || "Untitled"}</div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                <span className={values.listingType === "Rent"
-                  ? "bg-orange-100 text-orange-700 border border-orange-200 px-3 py-1 rounded-full text-xs font-semibold"
-                  : "bg-green-100 text-green-700 border border-green-200 px-3 py-1 rounded-full text-xs font-semibold"}>
+            <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-slate-50 dark:bg-[#1a2234] p-5 space-y-3">
+              <div className="font-extrabold text-slate-900 dark:text-white text-lg">
+                {values.title || "Untitled Listing"}
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <span
+                  className={
+                    values.listingType === "Rent"
+                      ? "bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 px-3 py-0.5 rounded-full text-xs font-bold"
+                      : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-3 py-0.5 rounded-full text-xs font-bold"
+                  }
+                >
                   {values.listingType}
                 </span>
-                <span className="bg-white/60 text-[#0f172a] border border-white/40 px-3 py-1 rounded-full text-xs font-semibold">
+                <span className="bg-slate-200/60 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300/60 dark:border-slate-700 px-3 py-0.5 rounded-full text-xs font-semibold">
                   {values.condition}
                 </span>
-                <span className="bg-white/60 text-[#0f172a] border border-white/40 px-3 py-1 rounded-full text-xs font-semibold">
+                <span className="bg-slate-200/60 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300/60 dark:border-slate-700 px-3 py-0.5 rounded-full text-xs font-semibold">
                   {values.category}
                 </span>
               </div>
 
-              <div className="mt-3 text-sm text-[#64748b] font-semibold">
-                {values.listingType === "Exchange" || Number(values.price) === 0
-                  ? "Free Exchange"
-                  : `₹${Number(values.price)}/day`}
-                {values.originalPrice && Number(values.originalPrice) > 0 ? (
-                  <span className="ml-3 line-through text-[#64748b] font-bold">
-                    ₹{Number(values.originalPrice)}
-                  </span>
-                ) : null}
-              </div>
-
-              <div className="mt-3 text-sm text-[#0f172a]">
-                {values.description || "No description"}
-              </div>
-
-              <div className="mt-4">
-                <div className="text-sm font-semibold text-[#0f172a]">Pickup: {values.pickupLocation}</div>
-              </div>
-
-              <div className="mt-3">
-                <div className="text-sm font-semibold text-[#0f172a]">Tags</div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {clampTags(values.tagsText).length ? (
-                    clampTags(values.tagsText).map((t) => (
-                      <span key={t} className="px-3 py-1 rounded-full text-xs font-semibold bg-white/60 text-[#0f172a] border border-white/40">
-                        {t}
+              <div className="text-sm font-bold text-slate-900 dark:text-white pt-1">
+                {values.listingType === "Exchange" || Number(values.price) === 0 ? (
+                  <span className="text-emerald-600 dark:text-emerald-400">Free Exchange</span>
+                ) : (
+                  <span>
+                    ₹{Number(values.price)}/day
+                    {values.originalPrice && Number(values.originalPrice) > 0 && (
+                      <span className="ml-2 text-xs line-through text-slate-400 font-medium">
+                        (Retail ₹{Number(values.originalPrice)})
                       </span>
-                    ))
-                  ) : (
-                    <span className="text-[#64748b] text-sm">No tags</span>
-                  )}
-                </div>
+                    )}
+                  </span>
+                )}
+              </div>
+
+              <div className="text-xs text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">
+                {values.description || "No description provided"}
+              </div>
+
+              <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                <span>Pickup: <strong className="text-slate-800 dark:text-slate-200">{values.pickupLocation}</strong></span>
+                <span>{normalizeImages(values.images).length} image(s) attached</span>
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between pt-3">
               <button
                 type="button"
                 onClick={goPrev}
-                className="px-5 py-3 rounded-xl bg-white/80 hover:bg-white border border-white/40 font-semibold text-[#0f172a] transition-all duration-200"
+                className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 font-semibold text-slate-700 dark:text-slate-300 text-sm transition-all"
               >
                 Back
               </button>
@@ -402,30 +426,30 @@ const ItemForm = ({
                 type="button"
                 disabled={pending}
                 onClick={() => void handleSubmit()}
-                className="bg-[#f97316] hover:bg-[#ea6c0a] text-white font-semibold rounded-xl px-6 py-3 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold rounded-xl px-7 py-2.5 transition-all duration-200 shadow-md shadow-orange-500/20 hover:shadow-orange-500/35 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
-                {pending ? "Submitting..." : submitLabel}
+                {pending ? "Publishing..." : submitLabel}
               </button>
             </div>
           </div>
         )}
 
         {step !== 4 && (
-          <div className="mt-6 flex items-center justify-between">
+          <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
             <button
               type="button"
               onClick={goPrev}
               disabled={step === 1}
-              className="px-5 py-3 rounded-xl bg-white/80 hover:bg-white border border-white/40 font-semibold text-[#0f172a] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 font-semibold text-slate-700 dark:text-slate-300 text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Back
             </button>
             <button
               type="button"
               onClick={goNext}
-              className="bg-[#f97316] hover:bg-[#ea6c0a] text-white font-semibold rounded-xl px-6 py-3 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25"
+              className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold rounded-xl px-6 py-2.5 transition-all duration-200 shadow-md shadow-orange-500/20 hover:shadow-orange-500/35 text-sm"
             >
-              Next
+              Continue →
             </button>
           </div>
         )}

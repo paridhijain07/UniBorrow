@@ -61,5 +61,9 @@ const ItemSchema = new mongoose.Schema(
   { timestamps: false }
 );
 
+ItemSchema.index({ owner: 1, createdAt: -1 });
+ItemSchema.index({ status: 1, category: 1, price: 1 });
+ItemSchema.index({ title: "text", description: "text", tags: "text" });
+
 module.exports = mongoose.model("Item", ItemSchema);
 

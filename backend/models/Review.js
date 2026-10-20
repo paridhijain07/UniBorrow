@@ -18,9 +18,9 @@ const ReviewSchema = new mongoose.Schema(
     booking: { type: mongoose.Schema.Types.ObjectId, ref: "Booking", required: true },
 
     overallRating: { type: Number, required: true, min: 1, max: 5 },
-    priceRating: { type: Number, min: 1, max: 5, default: 0 },
-    qualityRating: { type: Number, min: 1, max: 5, default: 0 },
-    conditionRating: { type: Number, min: 1, max: 5, default: 0 },
+    priceRating: { type: Number, min: 0, max: 5, default: 0 },
+    qualityRating: { type: Number, min: 0, max: 5, default: 0 },
+    conditionRating: { type: Number, min: 0, max: 5, default: 0 },
 
     comment: { type: String, default: "" },
 
@@ -28,5 +28,9 @@ const ReviewSchema = new mongoose.Schema(
   },
   { timestamps: false }
 );
+
+ReviewSchema.index({ targetUser: 1, createdAt: -1 });
+ReviewSchema.index({ item: 1, createdAt: -1 });
+ReviewSchema.index({ booking: 1 });
 
 module.exports = mongoose.model("Review", ReviewSchema);

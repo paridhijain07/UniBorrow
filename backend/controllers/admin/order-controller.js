@@ -113,18 +113,12 @@ const getAllOrdersOfAllUsers = async (req, res) => {
     const bookings = await Booking.find({})
       .populate("item")
       .populate("borrower")
-      .populate("owner");
-
-    if (!bookings.length) {
-      return res.status(404).json({
-        success: false,
-        message: "No bookings found!",
-      });
-    }
+      .populate("owner")
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
-      data: bookings,
+      data: bookings || [],
     });
   } catch (e) {
     console.log(e);

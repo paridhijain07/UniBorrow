@@ -1,13 +1,14 @@
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
+import { Star } from "lucide-react";
 
 import { createReview } from "../../api/reviews.api.js";
 
 const StarSelect = ({ label, value, onChange }) => {
   return (
     <div>
-      <div className="text-sm font-semibold text-[#0f172a]">{label}</div>
-      <div className="flex items-center gap-1 mt-2">
+      <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</div>
+      <div className="flex items-center gap-1.5 mt-1.5">
         {Array.from({ length: 5 }).map((_, idx) => {
           const v = idx + 1;
           const on = v <= value;
@@ -16,18 +17,21 @@ const StarSelect = ({ label, value, onChange }) => {
               key={v}
               type="button"
               onClick={() => onChange(v)}
-              className={
-                on
-                  ? "text-[#f97316] font-black text-xl leading-none"
-                  : "text-[#64748b] font-bold text-xl leading-none hover:text-[#f97316]"
-              }
+              className="p-1 -m-1 focus:outline-none transition-transform hover:scale-110"
               aria-label={`${label} ${v} stars`}
             >
-              ★
+              <Star
+                size={20}
+                className={
+                  on
+                    ? "text-amber-500 fill-amber-500 transition-colors"
+                    : "text-slate-300 dark:text-slate-700 hover:text-amber-400 transition-colors"
+                }
+              />
             </button>
           );
         })}
-        <span className="ml-3 text-xs text-[#64748b] font-semibold">
+        <span className="ml-2 text-xs text-slate-500 dark:text-slate-400 font-bold">
           {value || 0}/5
         </span>
       </div>
@@ -90,47 +94,51 @@ const ReviewForm = ({ bookingId, onSuccess }) => {
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl shadow-md p-5">
-      <h3 className="text-xl font-extrabold text-[#0f172a]">
-        Leave a review
+    <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-sm p-6">
+      <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+        Leave a Review
       </h3>
-      <p className="text-sm text-[#64748b] mt-2">
-        Multi-criteria ratings help students borrow with confidence.
+      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        Multi-criteria student ratings help build trust across the campus community.
       </p>
 
-      <div className="mt-4 space-y-4">
+      <div className="mt-5 space-y-4">
         <StarSelect
-          label="Overall"
+          label="Overall Experience"
           value={overallRating}
           onChange={setOverallRating}
         />
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800/60">
           <StarSelect
-            label="Price"
+            label="Pricing Value"
             value={priceRating}
             onChange={setPriceRating}
           />
           <StarSelect
-            label="Quality"
+            label="Item Quality"
             value={qualityRating}
             onChange={setQualityRating}
           />
         </div>
-        <StarSelect
-          label="Condition"
-          value={conditionRating}
-          onChange={setConditionRating}
-        />
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/60">
+          <StarSelect
+            label="Condition Accuracy"
+            value={conditionRating}
+            onChange={setConditionRating}
+          />
+        </div>
       </div>
 
-      <div className="mt-4">
-        <div className="text-sm font-semibold text-[#0f172a]">Comment</div>
+      <div className="mt-5">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+          Review Comments (Optional)
+        </label>
         <textarea
-          className="mt-2 w-full border border-white/40 bg-white/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
-          rows={4}
+          className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-all text-sm leading-relaxed"
+          rows={3}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="Share what went well (optional)."
+          placeholder="Share details about the item's condition or handover experience..."
         />
       </div>
 
@@ -138,7 +146,7 @@ const ReviewForm = ({ bookingId, onSuccess }) => {
         type="button"
         disabled={!canSubmit || pending}
         onClick={() => void handleSubmit()}
-        className="mt-5 bg-[#f97316] hover:bg-[#ea6c0a] text-white font-semibold rounded-xl px-6 py-3 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25 disabled:opacity-60 disabled:cursor-not-allowed"
+        className="mt-5 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold rounded-xl px-6 py-2.5 transition-all duration-200 shadow-md shadow-orange-500/20 hover:shadow-orange-500/35 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
       >
         {pending ? "Submitting..." : "Submit Review"}
       </button>

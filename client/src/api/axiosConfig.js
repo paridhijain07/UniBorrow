@@ -6,14 +6,16 @@ export const api = axios.create({
   baseURL: apiBaseURL,
 });
 
-// Attach JWT from localStorage
-api.interceptors.request.use((config) => {
+const attachAuth = (config) => {
   const token = localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
-});
+};
+
+api.interceptors.request.use(attachAuth);
+axios.interceptors.request.use(attachAuth);
 
 // Auto-logout on 401
 api.interceptors.response.use(
