@@ -19,8 +19,10 @@ import {
   PenTool,
   FlaskConical,
   Home as HomeIcon,
+  Compass,
 } from "lucide-react";
 import { api } from "../api/axiosConfig";
+import CampusMapModal from "../components/uniborrow/CampusMapModal.jsx";
 
 const categories = [
   { name: "Electronics", icon: Laptop },
@@ -71,6 +73,7 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [autocompleteResults, setAutocompleteResults] = useState([]);
   const [autocompleteOpen, setAutocompleteOpen] = useState(false);
+  const [mapModalOpen, setMapModalOpen] = useState(false);
   const heroSearchRef = useRef(null);
 
   const featuredTitle = useMemo(() => "Featured Campus Gear", []);
@@ -427,6 +430,41 @@ const Home = () => {
         </div>
       </section>
 
+      {/* 🗺️ CAMPUS HUBS INTERACTIVE MAP SHOWCASE */}
+      <section className="max-w-6xl mx-auto px-4">
+        <div className="bg-gradient-to-r from-orange-950/40 via-slate-900 to-slate-900 border border-orange-500/30 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden">
+          <div className="space-y-2 relative z-10 max-w-xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-orange-500/15 text-orange-400 border border-orange-500/30">
+              <Compass className="w-3.5 h-3.5 animate-spin" />
+              <span>Campus Pickup Hub Network</span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-black text-white">
+              7 Verified Meeting Hubs Across Campus
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Never meet outside your campus comfort zone. Hand off textbooks, lab equipment, and electronics at monitored zones like the Central Library, Canteen Plaza, and Academic Blocks.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto relative z-10 shrink-0">
+            <button
+              type="button"
+              onClick={() => setMapModalOpen(true)}
+              className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-xs shadow-lg shadow-orange-500/30 transition-all cursor-pointer"
+            >
+              <Compass className="w-4 h-4" />
+              <span>Explore Interactive Campus Map</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/browse")}
+              className="px-5 py-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 transition-colors text-center cursor-pointer"
+            >
+              Browse All Listings
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* 🏷️ CATEGORY GRID */}
       <section className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
@@ -725,6 +763,15 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* 🗺️ Interactive Campus Map Modal */}
+      <CampusMapModal
+        isOpen={mapModalOpen}
+        onClose={() => setMapModalOpen(false)}
+        onSelectHub={(hubId) => {
+          navigate(hubId ? `/browse?pickupLocation=${encodeURIComponent(hubId)}` : "/browse");
+        }}
+      />
     </div>
   );
 };

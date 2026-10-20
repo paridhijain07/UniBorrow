@@ -11,9 +11,13 @@ import {
   ChevronRight,
   Calendar,
   CheckCircle2,
+  Compass,
+  Leaf,
+  Sparkles,
 } from "lucide-react";
 import { getMyRequests, getReceivedRequests } from "../api/bookings.api";
 import { getNotifications } from "../api/notfications.api";
+import CampusMapModal from "../components/uniborrow/CampusMapModal.jsx";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -21,6 +25,7 @@ const Dashboard = () => {
   const [received, setReceived] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mapModalOpen, setMapModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,6 +57,12 @@ const Dashboard = () => {
     return b.status === "approved" && new Date(b.endDate) < new Date();
   };
 
+  const estimatedSavings = Math.max(
+    myBookings.reduce((acc, b) => acc + (b.totalCost ? b.totalCost * 2 : 650), 0),
+    myBookings.length > 0 ? 800 : 0
+  );
+  const co2Saved = Math.max(((myBookings.length + received.length) * 3.4).toFixed(1), 0);
+
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
@@ -82,6 +93,13 @@ const Dashboard = () => {
           </h1>
         </div>
         <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => setMapModalOpen(true)}
+            className="px-3.5 py-2 bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 hover:bg-orange-500/20 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span>Campus Map</span>
+          </button>
           <button
             onClick={() => navigate("/add-item")}
             className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white rounded-xl text-xs font-bold shadow-md shadow-orange-500/20 transition-all cursor-pointer"
@@ -178,6 +196,49 @@ const Dashboard = () => {
           </div>
           <div className="text-[11px] text-slate-400">
             Campus booking notifications
+          </div>
+        </div>
+      </div>
+
+      {/* 🌿 CAMPUS SHARING IMPACT & ECO SCORECARD */}
+      <div className="bg-gradient-to-r from-emerald-950/20 via-slate-900 to-amber-950/20 border border-emerald-500/20 rounded-3xl p-5 sm:p-6 shadow-sm">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="p-1 rounded-lg bg-emerald-500/10 text-emerald-500">
+                <Leaf className="w-4 h-4" />
+              </span>
+              <span className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                Community Sustainability & Savings
+              </span>
+            </div>
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+              Your Campus Impact Scorecard
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xl">
+              By renting and sharing instead of buying brand new equipment, you reduce semester expenses and keep electronics out of local landfills.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 w-full md:w-auto">
+            <div className="p-3 bg-white/60 dark:bg-[#111827]/80 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center">
+              <div className="text-[10px] font-semibold text-slate-400 uppercase">Est. Saved</div>
+              <div className="text-base sm:text-lg font-black text-emerald-500 mt-0.5">
+                ₹{estimatedSavings}
+              </div>
+            </div>
+            <div className="p-3 bg-white/60 dark:bg-[#111827]/80 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center">
+              <div className="text-[10px] font-semibold text-slate-400 uppercase">Items Shared</div>
+              <div className="text-base sm:text-lg font-black text-amber-500 mt-0.5">
+                {myBookings.length + received.length}
+              </div>
+            </div>
+            <div className="p-3 bg-white/60 dark:bg-[#111827]/80 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center">
+              <div className="text-[10px] font-semibold text-slate-400 uppercase">CO2 Offset</div>
+              <div className="text-base sm:text-lg font-black text-orange-500 mt-0.5">
+                {co2Saved} kg
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -407,6 +468,15 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* 🗺️ Interactive Campus Map Modal */}
+      <CampusMapModal
+        isOpen={mapModalOpen}
+        onClose={() => setMapModalOpen(false)}
+        onSelectHub={(hubId) => {
+          navigate(hubId ? `/browse?pickupLocation=${encodeURIComponent(hubId)}` : "/browse");
+        }}
+      />
     </div>
   );
 };

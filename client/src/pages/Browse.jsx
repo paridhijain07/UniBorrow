@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { MapPin, Search, ArrowRight, X } from "lucide-react";
+import { MapPin, Search, ArrowRight, X, Compass } from "lucide-react";
 import { api } from "../api/axiosConfig";
+import CampusMapModal from "../components/uniborrow/CampusMapModal.jsx";
 
 const categories = [
   "Electronics",
@@ -151,6 +152,7 @@ const Browse = () => {
   // Live autocomplete state
   const [autocompleteResults, setAutocompleteResults] = useState([]);
   const [autocompleteOpen, setAutocompleteOpen] = useState(false);
+  const [mapModalOpen, setMapModalOpen] = useState(false);
   const searchContainerRef = useRef(null);
 
   useEffect(() => {
@@ -303,9 +305,19 @@ const Browse = () => {
                 Campus Pickup Hubs
               </span>
             </div>
-            <span className="text-[11px] font-semibold text-slate-400">
-              Filter by pickup location
-            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setMapModalOpen(true)}
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 hover:bg-orange-500/20 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs"
+              >
+                <Compass className="w-3.5 h-3.5" />
+                <span>Interactive Map</span>
+              </button>
+              <span className="text-[11px] font-semibold text-slate-400 hidden sm:inline">
+                Filter by pickup location
+              </span>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
@@ -624,6 +636,20 @@ const Browse = () => {
           </div>
         </div>
       </section>
+
+      {/* 🗺️ Interactive Campus Map Modal */}
+      <CampusMapModal
+        isOpen={mapModalOpen}
+        onClose={() => setMapModalOpen(false)}
+        selectedHub={query.pickupLocation}
+        onSelectHub={(hubId) => {
+          setQuery((q) => ({
+            ...q,
+            pickupLocation: hubId,
+            page: 1,
+          }));
+        }}
+      />
     </div>
   );
 };

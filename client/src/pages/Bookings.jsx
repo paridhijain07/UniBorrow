@@ -46,6 +46,11 @@ const Bookings = () => {
   const [verifyTargetBooking, setVerifyTargetBooking] = useState(null);
   const [enteredCode, setEnteredCode] = useState("");
   const [verifiedBookings, setVerifiedBookings] = useState(new Set());
+  const [inspectionChecks, setInspectionChecks] = useState({
+    functional: true,
+    cosmetic: true,
+    accessories: true,
+  });
   const { data: received, loading: loadingReceived, error: errReceived, refetch: refetchReceived } =
     useReceivedRequests();
   const { data: myRequests, loading: loadingMine, error: errMine, refetch: refetchMine } =
@@ -67,6 +72,7 @@ const Bookings = () => {
   const handleOpenVerify = (booking) => {
     setVerifyTargetBooking(booking);
     setEnteredCode("");
+    setInspectionChecks({ functional: true, cosmetic: true, accessories: true });
     setVerifyModalOpen(true);
   };
 
@@ -77,8 +83,12 @@ const Bookings = () => {
       toast.error("Incorrect code. Please verify with the borrower's pass.");
       return;
     }
+    if (!inspectionChecks.functional || !inspectionChecks.cosmetic || !inspectionChecks.accessories) {
+      toast.error("Please complete all 3 physical inspection checklist items.");
+      return;
+    }
     setVerifiedBookings((prev) => new Set(prev).add(verifyTargetBooking._id));
-    toast.success("Handover confirmed! Item marked as physically exchanged.");
+    toast.success("Handover confirmed! Physical checklist signed off.");
     setVerifyModalOpen(false);
   };
 
@@ -310,6 +320,18 @@ const Bookings = () => {
                       </div>
                     )}
 
+                    {verifiedBookings.has(b._id) && (
+                      <div className="mt-3 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
+                          <span>Handover Handshake Completed • Checklist Passed</span>
+                        </div>
+                        <span className="text-[10px] font-mono text-emerald-600/80 dark:text-emerald-400/80">
+                          Pass: #{b._id.slice(-4).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+
                     <div className="mt-4 flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-200/60 dark:border-slate-800/60">
                       <div className="flex flex-wrap items-center gap-2">
                         {/* Direct Chat Shortcut */}
@@ -457,8 +479,67 @@ const Bookings = () => {
             </div>
 
             <div className="mt-4 space-y-4">
+              {/* Item Snapshot */}
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-[#161f30] border border-slate-200/80 dark:border-slate-800">
+                <img
+                  src={verifyTargetBooking?.item?.images?.[0] || "/default-item.svg"}
+                  alt={verifyTargetBooking?.item?.title || "Item"}
+                  className="w-12 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    {verifyTargetBooking?.item?.title}
+                  </h4>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    Borrower: <span className="font-semibold text-slate-800 dark:text-slate-200">{verifyTargetBooking?.borrower?.name}</span>
+                  </div>
+                  {verifyTargetBooking?.item?.pickupLocation && (
+                    <div className="text-[10px] text-orange-600 dark:text-orange-400 font-semibold flex items-center gap-1 mt-0.5">
+                      <span>📍 {verifyTargetBooking.item.pickupLocation}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Handover Inspection Checklist */}
+              <div className="space-y-2 p-3.5 rounded-2xl bg-amber-500/5 border border-amber-500/20">
+                <div className="text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Physical Inspection Checklist</span>
+                </div>
+                <div className="space-y-1.5 text-xs">
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={inspectionChecks.functional}
+                      onChange={(e) => setInspectionChecks(prev => ({ ...prev, functional: e.target.checked }))}
+                      className="rounded text-orange-500 focus:ring-orange-500 w-3.5 h-3.5 accent-orange-500"
+                    />
+                    <span>Item powers on & functions as expected</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={inspectionChecks.cosmetic}
+                      onChange={(e) => setInspectionChecks(prev => ({ ...prev, cosmetic: e.target.checked }))}
+                      className="rounded text-orange-500 focus:ring-orange-500 w-3.5 h-3.5 accent-orange-500"
+                    />
+                    <span>Screen & physical body inspected (no new cracks/dents)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={inspectionChecks.accessories}
+                      onChange={(e) => setInspectionChecks(prev => ({ ...prev, accessories: e.target.checked }))}
+                      className="rounded text-orange-500 focus:ring-orange-500 w-3.5 h-3.5 accent-orange-500"
+                    />
+                    <span>Charger, cables & included accessories present</span>
+                  </label>
+                </div>
+              </div>
+
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                Ask the borrower to show their <strong>Pickup Pass</strong> on their phone screen, and enter the 4-digit code below to confirm handover:
+                Enter the 4-digit <strong>Pickup Pass</strong> shown on the borrower&apos;s screen:
               </p>
 
               <div>
