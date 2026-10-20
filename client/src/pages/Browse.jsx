@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { MapPin, Search, ArrowRight, X } from "lucide-react";
 import { api } from "../api/axiosConfig";
 
 const categories = [
@@ -23,6 +24,17 @@ const pickupZones = [
   "Hostel-C",
   "Main Gate",
   "Academic Block",
+];
+
+const CAMPUS_HUBS = [
+  { id: "", label: "All Campus", icon: "🏛️" },
+  { id: "Library", label: "Central Library", icon: "📚" },
+  { id: "Canteen", label: "Campus Canteen", icon: "☕" },
+  { id: "Academic Block", label: "Academic Block", icon: "🏢" },
+  { id: "Main Gate", label: "Main Gate", icon: "🚪" },
+  { id: "Hostel-A", label: "Hostel-A", icon: "🛏️" },
+  { id: "Hostel-B", label: "Hostel-B", icon: "🛏️" },
+  { id: "Hostel-C", label: "Hostel-C", icon: "🛏️" },
 ];
 
 const FeaturedItemCard = ({ it, onOpen }) => {
@@ -136,6 +148,11 @@ const Browse = () => {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
 
+  // Live autocomplete state
+  const [autocompleteResults, setAutocompleteResults] = useState([]);
+  const [autocompleteOpen, setAutocompleteOpen] = useState(false);
+  const searchContainerRef = useRef(null);
+
   useEffect(() => {
     setQuery(initialParams);
     setDebouncedSearch(initialParams.search);
@@ -145,6 +162,39 @@ const Browse = () => {
     const t = setTimeout(() => setDebouncedSearch(query.search), 300);
     return () => clearTimeout(t);
   }, [query.search]);
+
+  // Autocomplete fetch as user types
+  useEffect(() => {
+    if (!query.search || query.search.trim().length < 2) {
+      setAutocompleteResults([]);
+      setAutocompleteOpen(false);
+      return;
+    }
+
+    const t = setTimeout(async () => {
+      try {
+        const res = await api.get(`/items?search=${encodeURIComponent(query.search.trim())}&limit=5`);
+        const items = res?.data?.items || [];
+        setAutocompleteResults(items);
+        setAutocompleteOpen(items.length > 0);
+      } catch {
+        // Ignore autocomplete error
+      }
+    }, 200);
+
+    return () => clearTimeout(t);
+  }, [query.search]);
+
+  // Click outside to dismiss autocomplete
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+        setAutocompleteOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const run = async () => {
@@ -244,25 +294,123 @@ const Browse = () => {
   return (
     <div className="w-full pb-16">
       <section className="max-w-6xl mx-auto px-4 pt-4 sm:pt-6">
+        {/* 🏛️ CAMPUS PICKUP HUBS QUICK BAR */}
+        <div className="mb-4 bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3 shadow-xs">
+          <div className="flex items-center justify-between mb-2.5 px-1">
+            <div className="flex items-center gap-1.5">
+              <MapPin className="w-4 h-4 text-[#f97316]" />
+              <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                Campus Pickup Hubs
+              </span>
+            </div>
+            <span className="text-[11px] font-semibold text-slate-400">
+              Filter by pickup location
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+            {CAMPUS_HUBS.map((hub) => {
+              const isSelected = query.pickupLocation === hub.id;
+              return (
+                <button
+                  key={hub.id}
+                  type="button"
+                  onClick={() =>
+                    setQuery((q) => ({
+                      ...q,
+                      pickupLocation: isSelected && hub.id !== "" ? "" : hub.id,
+                      page: 1,
+                    }))
+                  }
+                  className={`shrink-0 flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer border ${
+                    isSelected
+                      ? "bg-gradient-to-r from-orange-500 to-amber-600 text-white border-transparent shadow-md shadow-orange-500/25"
+                      : "bg-slate-50 dark:bg-[#161f30] border-slate-200/80 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 hover:border-orange-500/40 hover:bg-white dark:hover:bg-[#1a2438]"
+                  }`}
+                >
+                  <span className="text-sm">{hub.icon}</span>
+                  <span>{hub.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Sticky search and active filter bar */}
         <div className="bg-white/90 dark:bg-[#111827]/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-sm p-3.5 sticky top-[64px] z-20">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="flex-1 flex items-center bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-2 text-sm">
-              <span className="text-slate-400 mr-2">🔍</span>
-              <input
-                className="w-full bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 outline-none text-sm"
-                placeholder="Search items, descriptions, tags (e.g. keyboard, textbook, cycle)..."
-                value={query.search}
-                onChange={(e) => setQuery((q) => ({ ...q, search: e.target.value, page: 1 }))}
-              />
+          <div ref={searchContainerRef} className="relative">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex-1 flex items-center bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-2 text-sm focus-within:border-orange-500/50 transition-colors">
+                <Search className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
+                <input
+                  className="w-full bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 outline-none text-sm font-medium"
+                  placeholder="Search items, textbooks, electronics, cycle..."
+                  value={query.search}
+                  onChange={(e) => setQuery((q) => ({ ...q, search: e.target.value, page: 1 }))}
+                  onFocus={() => {
+                    if (autocompleteResults.length > 0) setAutocompleteOpen(true);
+                  }}
+                />
+                {query.search && (
+                  <button
+                    type="button"
+                    onClick={() => setQuery((q) => ({ ...q, search: "", page: 1 }))}
+                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={clearAll}
+                className="bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/30 text-slate-600 hover:text-rose-600 dark:text-slate-300 dark:hover:text-rose-400 font-semibold text-xs rounded-xl px-3.5 py-2.5 transition-colors shrink-0 cursor-pointer"
+              >
+                Reset
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={clearAll}
-              className="bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/30 text-slate-600 hover:text-rose-600 dark:text-slate-300 dark:hover:text-rose-400 font-semibold text-xs rounded-xl px-3.5 py-2.5 transition-colors shrink-0"
-            >
-              Reset
-            </button>
+
+            {/* Instant Search Autocomplete Dropdown */}
+            {autocompleteOpen && autocompleteResults.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#111827] border border-slate-200/90 dark:border-slate-800/90 rounded-2xl shadow-2xl p-2 z-50 divide-y divide-slate-100 dark:divide-slate-800/60 animate-in fade-in slide-in-from-top-1 duration-150">
+                <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 px-3 py-1.5 flex items-center justify-between">
+                  <span>Quick Results</span>
+                  <span>Direct Jump</span>
+                </div>
+                <div className="space-y-1 pt-1">
+                  {autocompleteResults.map((item) => (
+                    <div
+                      key={item._id}
+                      onClick={() => {
+                        setAutocompleteOpen(false);
+                        navigate(`/item/${item._id}`);
+                      }}
+                      className="flex items-center gap-3 p-2 rounded-xl hover:bg-orange-500/10 dark:hover:bg-orange-500/15 cursor-pointer transition-colors group"
+                    >
+                      <img
+                        src={item.images?.[0] || "/default-item.svg"}
+                        alt={item.title}
+                        className="w-10 h-10 rounded-lg object-cover border border-slate-200 dark:border-slate-700 shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-orange-500 transition-colors">
+                          {item.title}
+                        </h5>
+                        <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400">
+                          <span className="font-bold text-orange-600 dark:text-orange-400">
+                            {item.listingType === "Rent" ? `₹${item.price}/day` : "Free Exchange"}
+                          </span>
+                          {item.pickupLocation && (
+                            <span>• 📍 {item.pickupLocation}</span>
+                          )}
+                        </div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-orange-500 transition-transform group-hover:translate-x-0.5" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {activeChips.length > 0 && (

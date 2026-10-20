@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Search,
@@ -69,8 +69,44 @@ const Home = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [autocompleteResults, setAutocompleteResults] = useState([]);
+  const [autocompleteOpen, setAutocompleteOpen] = useState(false);
+  const heroSearchRef = useRef(null);
 
   const featuredTitle = useMemo(() => "Featured Campus Gear", []);
+
+  // Live autocomplete fetch
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim().length < 2) {
+      setAutocompleteResults([]);
+      setAutocompleteOpen(false);
+      return;
+    }
+
+    const t = setTimeout(async () => {
+      try {
+        const res = await api.get(`/items?search=${encodeURIComponent(searchQuery.trim())}&limit=5`);
+        const items = res?.data?.items || [];
+        setAutocompleteResults(items);
+        setAutocompleteOpen(items.length > 0);
+      } catch {
+        // Ignore error
+      }
+    }, 200);
+
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
+  // Click outside to close autocomplete
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (heroSearchRef.current && !heroSearchRef.current.contains(e.target)) {
+        setAutocompleteOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const run = async () => {
@@ -139,42 +175,89 @@ const Home = () => {
                 Connect directly with classmates to rent textbooks, electronics, lab supplies, and hostel essentials. Coordinate in-app and pick up safely on campus.
               </p>
 
-              {/* Instant Search Bar */}
-              <form
-                onSubmit={handleHeroSearch}
-                className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 p-2 rounded-2xl shadow-xl shadow-slate-900/5 dark:shadow-black/20 flex flex-col sm:flex-row gap-2 max-w-xl ring-1 ring-black/5"
-              >
-                <div className="flex-1 flex items-center px-3 gap-2">
-                  <Search className="w-4 h-4 text-slate-400 shrink-0" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search cameras, textbooks, calculators..."
-                    className="w-full bg-transparent text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none"
-                  />
-                </div>
-                <div className="sm:border-l border-slate-200 dark:border-slate-800 px-2 flex items-center">
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="bg-transparent text-xs text-slate-700 dark:text-slate-300 outline-none py-1.5 pr-2 font-medium cursor-pointer"
-                  >
-                    <option value="" className="bg-white dark:bg-[#111827]">All Categories</option>
-                    {categories.map((c) => (
-                      <option value={c.name} key={c.name} className="bg-white dark:bg-[#111827]">
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <button
-                  type="submit"
-                  className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-md shadow-orange-500/20 hover:shadow-orange-500/35 transition-all shrink-0 cursor-pointer"
+              {/* Instant Search Bar with Live Autocomplete */}
+              <div ref={heroSearchRef} className="relative max-w-xl">
+                <form
+                  onSubmit={handleHeroSearch}
+                  className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 p-2 rounded-2xl shadow-xl shadow-slate-900/5 dark:shadow-black/20 flex flex-col sm:flex-row gap-2 ring-1 ring-black/5"
                 >
-                  Find Gear
-                </button>
-              </form>
+                  <div className="flex-1 flex items-center px-3 gap-2">
+                    <Search className="w-4 h-4 text-slate-400 shrink-0" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onFocus={() => {
+                        if (autocompleteResults.length > 0) setAutocompleteOpen(true);
+                      }}
+                      placeholder="Search cameras, textbooks, calculators..."
+                      className="w-full bg-transparent text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none font-medium"
+                    />
+                  </div>
+                  <div className="sm:border-l border-slate-200 dark:border-slate-800 px-2 flex items-center">
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="bg-transparent text-xs text-slate-700 dark:text-slate-300 outline-none py-1.5 pr-2 font-medium cursor-pointer"
+                    >
+                      <option value="" className="bg-white dark:bg-[#111827]">All Categories</option>
+                      {categories.map((c) => (
+                        <option value={c.name} key={c.name} className="bg-white dark:bg-[#111827]">
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <button
+                    type="submit"
+                    className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-md shadow-orange-500/20 hover:shadow-orange-500/35 transition-all shrink-0 cursor-pointer"
+                  >
+                    Find Gear
+                  </button>
+                </form>
+
+                {/* Autocomplete Popup */}
+                {autocompleteOpen && autocompleteResults.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#111827] border border-slate-200/90 dark:border-slate-800/90 rounded-2xl shadow-2xl p-2 z-50 divide-y divide-slate-100 dark:divide-slate-800/60 animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 px-3 py-1.5 flex items-center justify-between">
+                      <span>Quick Matches</span>
+                      <span>1-Click View</span>
+                    </div>
+                    <div className="space-y-1 pt-1">
+                      {autocompleteResults.map((item) => (
+                        <div
+                          key={item._id}
+                          onClick={() => {
+                            setAutocompleteOpen(false);
+                            navigate(`/item/${item._id}`);
+                          }}
+                          className="flex items-center gap-3 p-2 rounded-xl hover:bg-orange-500/10 dark:hover:bg-orange-500/15 cursor-pointer transition-colors group"
+                        >
+                          <img
+                            src={item.images?.[0] || "/default-item.svg"}
+                            alt={item.title}
+                            className="w-10 h-10 rounded-lg object-cover border border-slate-200 dark:border-slate-700 shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-orange-500 transition-colors">
+                              {item.title}
+                            </h5>
+                            <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400">
+                              <span className="font-bold text-orange-600 dark:text-orange-400">
+                                {item.listingType === "Rent" ? `₹${item.price}/day` : "Free Exchange"}
+                              </span>
+                              {item.pickupLocation && (
+                                <span>• 📍 {item.pickupLocation}</span>
+                              )}
+                            </div>
+                          </div>
+                          <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-orange-500 transition-transform group-hover:translate-x-0.5" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Popular category tags */}
               <div className="flex items-center gap-2 flex-wrap text-xs text-slate-500 dark:text-slate-400 pt-1">
