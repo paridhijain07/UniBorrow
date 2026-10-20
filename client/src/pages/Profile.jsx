@@ -12,6 +12,7 @@ import {
   CheckCircle,
   X,
   ExternalLink,
+  Award,
 } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext.jsx";
@@ -44,6 +45,12 @@ const Profile = () => {
   const [editBio, setEditBio] = useState("");
   const [editPickupZone, setEditPickupZone] = useState("");
   const [editSaving, setEditSaving] = useState(false);
+
+  // Verification Modal State
+  const [verifyOpen, setVerifyOpen] = useState(false);
+  const [department, setDepartment] = useState("Computer Science & Engineering");
+  const [studentIdNumber, setStudentIdNumber] = useState("");
+  const [verifySaving, setVerifySaving] = useState(false);
 
   const isMe = Boolean(authUser?.id && String(authUser.id) === String(id));
 
@@ -109,6 +116,30 @@ const Profile = () => {
       );
     } finally {
       setEditSaving(false);
+    }
+  };
+
+  const handleVerifyStudent = async (e) => {
+    e.preventDefault();
+    try {
+      setVerifySaving(true);
+      const res = await updateProfile({ verifiedBadge: true });
+      toast.success("Congratulations! Your campus student status has been verified.");
+      if (res?.user) {
+        setProfileData((prev) => ({
+          ...prev,
+          user: {
+            ...prev.user,
+            verifiedBadge: true,
+            verified: true,
+          },
+        }));
+      }
+      setVerifyOpen(false);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to verify student badge");
+    } finally {
+      setVerifySaving(false);
     }
   };
 
@@ -213,20 +244,31 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-2.5 w-full sm:w-auto flex-wrap">
             {isMe ? (
-              <button
-                type="button"
-                onClick={() => setEditOpen(true)}
-                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl font-bold transition-all shadow-sm text-sm"
-              >
-                <Edit3 size={16} /> Edit Profile
-              </button>
+              <>
+                {!user.verifiedBadge && (
+                  <button
+                    type="button"
+                    onClick={() => setVerifyOpen(true)}
+                    className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-md shadow-blue-500/20 text-sm cursor-pointer"
+                  >
+                    <ShieldCheck size={16} /> Get Verified
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setEditOpen(true)}
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl font-bold transition-all shadow-sm text-sm cursor-pointer"
+                >
+                  <Edit3 size={16} /> Edit Profile
+                </button>
+              </>
             ) : (
               <button
                 type="button"
-                onClick={() => navigate(`/chat/${user.id}`)}
-                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white rounded-xl font-bold transition-all shadow-md shadow-orange-500/20 hover:shadow-orange-500/35 text-sm"
+                onClick={() => navigate(`/chat/${user.id || user._id}`)}
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white rounded-xl font-bold transition-all shadow-md shadow-orange-500/20 hover:shadow-orange-500/35 text-sm cursor-pointer"
               >
                 <MessageSquare size={16} /> Send Message
               </button>
@@ -261,11 +303,16 @@ const Profile = () => {
           </div>
 
           <div className="bg-slate-50 dark:bg-[#1a2234] p-3.5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60">
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-              Response Rate
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1">
+              <Award size={14} className="text-blue-500" />
+              Campus Standing
             </div>
-            <div className="text-xl font-black text-slate-900 dark:text-white mt-1">
-              {user.responseRate ?? 100}%
+            <div className="text-sm font-black text-blue-600 dark:text-blue-400 mt-1 truncate">
+              {(user.totalLent || 0) + (user.totalBorrowed || 0) >= 10
+                ? "👑 Power Lender"
+                : (user.totalLent || 0) + (user.totalBorrowed || 0) >= 3
+                ? "⭐ Trusted Student"
+                : "🌱 Active Member"}
             </div>
           </div>
 
@@ -515,6 +562,90 @@ const Profile = () => {
                   className="px-5 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold transition-all shadow-md shadow-orange-500/20 disabled:opacity-50 text-sm"
                 >
                   {editSaving ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Verification Modal */}
+      {verifyOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative">
+            <button
+              type="button"
+              onClick={() => setVerifyOpen(false)}
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                <ShieldCheck size={26} />
+              </div>
+              <div>
+                <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">
+                  Student Verification
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Campus Trust & Safety Program
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+              Verifying your student identity unlocks the blue <strong>Verified Student Badge</strong>, boosting lender confidence when you borrow gear across campus.
+            </p>
+
+            <form onSubmit={handleVerifyStudent} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                  Academic Department
+                </label>
+                <select
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/40 text-sm"
+                >
+                  <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                  <option value="Mechanical & Civil Engineering">Mechanical & Civil Engineering</option>
+                  <option value="Electrical & Electronics">Electrical & Electronics</option>
+                  <option value="Business & Management">Business & Management</option>
+                  <option value="Sciences & Mathematics">Sciences & Mathematics</option>
+                  <option value="Design & Architecture">Design & Architecture</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                  Student ID Number / Roll No.
+                </label>
+                <input
+                  type="text"
+                  value={studentIdNumber}
+                  onChange={(e) => setStudentIdNumber(e.target.value)}
+                  placeholder="e.g. 2024CSB1042"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/40 text-sm font-mono"
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/60">
+                <button
+                  type="button"
+                  onClick={() => setVerifyOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={verifySaving}
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all shadow-md shadow-blue-500/20 disabled:opacity-50 text-sm cursor-pointer"
+                >
+                  {verifySaving ? "Verifying..." : "Verify Instantly"}
                 </button>
               </div>
             </form>

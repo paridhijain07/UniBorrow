@@ -61,7 +61,7 @@ const updateMyProfile = async (req, res, next) => {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    const { name, bio, avatar, pickupZone } = req.body;
+    const { name, bio, avatar, pickupZone, verifiedBadge } = req.body;
 
     const updated = await User.findByIdAndUpdate(
       userId,
@@ -70,6 +70,7 @@ const updateMyProfile = async (req, res, next) => {
         ...(bio !== undefined ? { bio } : {}),
         ...(avatar !== undefined ? { avatar } : {}),
         ...(pickupZone !== undefined ? { pickupZone } : {}),
+        ...(verifiedBadge !== undefined ? { verifiedBadge, verified: Boolean(verifiedBadge) } : {}),
       },
       { new: true }
     ).select(
