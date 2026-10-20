@@ -145,7 +145,7 @@ const bookedRanges = useMemo(() => {
       toast.error("Owner not found.");
       return;
     }
-    navigate(`/chat/${ownerId}`);
+    navigate(`/chat/${ownerId}?itemId=${id}`);
   };
 
   const handleConfirmBooking = async ({ startDate, endDate }) => {

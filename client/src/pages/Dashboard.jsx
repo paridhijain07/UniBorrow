@@ -273,7 +273,13 @@ const Dashboard = () => {
                           View Item
                         </button>
                         <button
-                          onClick={() => navigate(`/chat/${b.owner?._id || b.owner}`)}
+                          onClick={() =>
+                            navigate(
+                              `/chat/${b.owner?._id || b.owner}${
+                                b.item?._id || b.item ? `?itemId=${b.item?._id || b.item}` : ""
+                              }`
+                            )
+                          }
                           className="px-3 py-1.5 rounded-lg bg-orange-500 text-white text-xs font-semibold hover:bg-orange-600"
                         >
                           Message

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom";
 import { io } from "socket.io-client";
 import {
   Search,
@@ -17,14 +17,40 @@ import {
   MessageCircle,
   HelpCircle,
   Clock,
+  Calendar,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { getConversations, getThread, sendMessage } from "../api/messages.api";
+import { getItemById } from "../api/items.api";
+import { createBooking, getItemBookings } from "../api/bookings.api";
+import BookingModal from "../components/uniborrow/BookingModal.jsx";
 import { useAuth } from "../hooks/useAuth.js";
 
 const rawApiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const SOCKET_URL = rawApiUrl.replace(/\/api\/?$/, "");
+
+// Web Audio API notification chime for incoming messages
+const playNotificationChime = () => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12); // A5
+    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.22);
+  } catch {
+    // AudioContext blocked or muted
+  }
+};
 
 // Date formatting helpers
 const isSameDay = (d1, d2) => {
@@ -84,7 +110,16 @@ const QUICK_PROMPTS = [
 const ChatPage = () => {
   const navigate = useNavigate();
   const { userId } = useParams();
+  const [searchParams] = useSearchParams();
+  const queryItemId = searchParams.get("itemId");
   const { user } = useAuth();
+
+  // Item context state
+  const [activeItem, setActiveItem] = useState(null);
+  const [showItemBanner, setShowItemBanner] = useState(true);
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const [bookingPending, setBookingPending] = useState(false);
+  const [bookedRanges, setBookedRanges] = useState([]);
 
   // Conversations sidebar state
   const [conversations, setConversations] = useState([]);
@@ -163,6 +198,35 @@ const ChatPage = () => {
     };
   }, [userId]);
 
+  // Load item context banner if query param itemId is provided
+  useEffect(() => {
+    if (!queryItemId) {
+      setActiveItem(null);
+      setBookedRanges([]);
+      return;
+    }
+
+    let isMounted = true;
+    setShowItemBanner(true);
+
+    Promise.all([
+      getItemById(queryItemId).catch(() => null),
+      getItemBookings(queryItemId).catch(() => ({ bookings: [] })),
+    ]).then(([itemRes, bookingsRes]) => {
+      if (!isMounted) return;
+      if (itemRes) {
+        setActiveItem(itemRes.item || itemRes);
+      }
+      if (bookingsRes?.bookings) {
+        setBookedRanges(bookingsRes.bookings);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [queryItemId]);
+
   // 3. Socket initialization and live presence & message subscriptions
   useEffect(() => {
     if (!user?.id) return;
@@ -198,6 +262,11 @@ const ChatPage = () => {
     });
 
     socket.on("receive_private_message", (msg) => {
+      // Play audio chime if received from peer
+      if (msg.sender !== user?.id) {
+        playNotificationChime();
+      }
+
       // A. If msg belongs to current open thread, append it
       if (msg.sender === userId || msg.receiver === userId) {
         setActiveMessages((prev) => {
@@ -290,6 +359,7 @@ const ChatPage = () => {
       const res = await sendMessage({
         receiverId: userId,
         text: textToSend,
+        itemId: queryItemId || activeItem?._id || undefined,
       });
 
       const newMsg = res?.message || {
@@ -341,6 +411,39 @@ const ChatPage = () => {
       handleSend();
     }
   };
+
+  // Direct booking handler from chat
+  const handleConfirmBookingFromChat = async ({ startDate, endDate }) => {
+    if (!activeItem?._id) return;
+    setBookingPending(true);
+    try {
+      await createBooking({ itemId: activeItem._id, startDate, endDate });
+      toast.success("Booking request sent!");
+      setBookingModalOpen(false);
+
+      const sDate = new Date(startDate).toLocaleDateString([], { month: "short", day: "numeric" });
+      const eDate = new Date(endDate).toLocaleDateString([], { month: "short", day: "numeric" });
+      const handoverMsg = `📅 I have requested a booking for "${activeItem.title}" from ${sDate} to ${eDate}. Let's coordinate pickup time and handover spot!`;
+      await handleSend(handoverMsg);
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.response?.data?.message || "Failed to submit booking request");
+    } finally {
+      setBookingPending(false);
+    }
+  };
+
+  // Context-aware quick prompts
+  const activePrompts = useMemo(() => {
+    if (activeItem) {
+      return [
+        `👋 Hi! Is "${activeItem.title}" available to borrow?`,
+        `📍 Can we meet at the ${activeItem.pickupZone || "Library"} for pickup?`,
+        ...QUICK_PROMPTS.slice(2),
+      ];
+    }
+    return QUICK_PROMPTS;
+  }, [activeItem]);
 
   // Filter conversations
   const filteredConversations = useMemo(() => {
@@ -764,6 +867,74 @@ const ChatPage = () => {
                 </div>
               </div>
 
+              {/* Embedded In-Chat Item Context Banner */}
+              {activeItem && showItemBanner && (
+                <div className="bg-white/95 dark:bg-[#131b2c]/95 border-b border-slate-200/80 dark:border-slate-800/80 px-4 py-2.5 flex items-center justify-between gap-3 shadow-xs relative z-10 backdrop-blur-md">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <img
+                      src={activeItem.images?.[0] || activeItem.image || "/default-item.svg"}
+                      alt={activeItem.title}
+                      className="w-12 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0"
+                    />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20">
+                          {activeItem.category || "Item"}
+                        </span>
+                        {activeItem.pickupZone && (
+                          <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-0.5">
+                            <MapPin className="w-2.5 h-2.5 text-orange-500" />
+                            {activeItem.pickupZone}
+                          </span>
+                        )}
+                      </div>
+                      <h4 className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white truncate mt-0.5">
+                        {activeItem.title}
+                      </h4>
+                      <p className="text-[11px] font-bold text-orange-600 dark:text-orange-400">
+                        {activeItem.listingType === "Rent"
+                          ? `₹${activeItem.price}/day`
+                          : "Free to Borrow"}
+                        {activeItem.securityDeposit > 0 && (
+                          <span className="text-slate-400 font-normal ml-2">
+                            • Deposit: ₹{activeItem.securityDeposit}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {activeItem.owner !== user?.id && (
+                      <button
+                        type="button"
+                        onClick={() => setBookingModalOpen(true)}
+                        className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-xs px-3 py-1.5 rounded-xl shadow-sm transition-all duration-200 flex items-center gap-1.5 active:scale-95 cursor-pointer"
+                      >
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Book Item</span>
+                        <span className="sm:hidden">Book</span>
+                      </button>
+                    )}
+                    <Link
+                      to={`/item/${activeItem._id}`}
+                      className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      title="View full listing details"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => setShowItemBanner(false)}
+                      className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      title="Dismiss item banner"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Message Feed Container */}
               <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-3.5 bg-slate-50/50 dark:bg-[#0b0f19]">
                 {threadLoading ? (
@@ -861,7 +1032,7 @@ const ChatPage = () => {
                 <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 shrink-0 flex items-center gap-1">
                   <Sparkles className="w-3 h-3 text-orange-500" /> Quick:
                 </span>
-                {QUICK_PROMPTS.map((prompt, idx) => (
+                {activePrompts.map((prompt, idx) => (
                   <button
                     key={idx}
                     type="button"
@@ -905,6 +1076,18 @@ const ChatPage = () => {
         </div>
 
       </div>
+
+      {/* Booking Modal mounted directly in Chat */}
+      {activeItem && (
+        <BookingModal
+          open={bookingModalOpen}
+          onClose={() => setBookingModalOpen(false)}
+          onConfirm={handleConfirmBookingFromChat}
+          pending={bookingPending}
+          item={activeItem}
+          bookedRanges={bookedRanges}
+        />
+      )}
     </div>
   );
 };
