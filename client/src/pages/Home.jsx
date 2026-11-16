@@ -1,16 +1,38 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Search,
+  Sparkles,
+  ShieldCheck,
+  MessageSquare,
+  Repeat,
+  ArrowRight,
+  MapPin,
+  TrendingUp,
+  Users,
+  CheckCircle2,
+  BookOpen,
+  Laptop,
+  Bike,
+  Armchair,
+  Shirt,
+  PenTool,
+  FlaskConical,
+  Home as HomeIcon,
+  Compass,
+} from "lucide-react";
 import { api } from "../api/axiosConfig";
+import CampusMapModal from "../components/uniborrow/CampusMapModal.jsx";
 
 const categories = [
-  "Electronics",
-  "Books",
-  "Furniture",
-  "Clothing",
-  "Stationery",
-  "Lab Equipment",
-  "Hostel Essentials",
-  "Bikes",
+  { name: "Electronics", icon: Laptop },
+  { name: "Books", icon: BookOpen },
+  { name: "Furniture", icon: Armchair },
+  { name: "Clothing", icon: Shirt },
+  { name: "Stationery", icon: PenTool },
+  { name: "Lab Equipment", icon: FlaskConical },
+  { name: "Hostel Essentials", icon: HomeIcon },
+  { name: "Bikes", icon: Bike },
 ];
 
 const AnimatedCounter = ({ value, durationMs = 900 }) => {
@@ -42,14 +64,52 @@ const Home = () => {
   const [stats, setStats] = useState({
     itemsListed: 0,
     activeBorrows: 0,
-    totalEarned: 0,
-    totalSpent: 0,
     verifiedUsers: 0,
   });
   const [featured, setFeatured] = useState([]);
-  const [error, setError] = useState("");
+  const [_error, setError] = useState("");
 
-  const featuredTitle = useMemo(() => "Featured Items", []);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [autocompleteResults, setAutocompleteResults] = useState([]);
+  const [autocompleteOpen, setAutocompleteOpen] = useState(false);
+  const [mapModalOpen, setMapModalOpen] = useState(false);
+  const heroSearchRef = useRef(null);
+
+  const featuredTitle = useMemo(() => "Featured Campus Gear", []);
+
+  // Live autocomplete fetch
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim().length < 2) {
+      setAutocompleteResults([]);
+      setAutocompleteOpen(false);
+      return;
+    }
+
+    const t = setTimeout(async () => {
+      try {
+        const res = await api.get(`/items?search=${encodeURIComponent(searchQuery.trim())}&limit=5`);
+        const items = res?.data?.items || [];
+        setAutocompleteResults(items);
+        setAutocompleteOpen(items.length > 0);
+      } catch {
+        // Ignore error
+      }
+    }, 200);
+
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
+  // Click outside to close autocomplete
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (heroSearchRef.current && !heroSearchRef.current.contains(e.target)) {
+        setAutocompleteOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const run = async () => {
@@ -83,231 +143,635 @@ const Home = () => {
     run();
   }, []);
 
+  const handleHeroSearch = (e) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (searchQuery.trim()) params.set("search", searchQuery.trim());
+    if (selectedCategory) params.set("category", selectedCategory);
+    navigate(`/browse?${params.toString()}`);
+  };
+
   return (
-    <div className="w-full">
-      <section className="max-w-6xl mx-auto px-4 pt-10 pb-8">
-        <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#27272a] rounded-2xl p-8 shadow-md">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-extrabold leading-tight text-[#0f172a] dark:text-[#f4f4f5]">
-                Borrow & Exchange within your campus.
+    <div className="w-full space-y-16 pb-16">
+      {/* 🚀 HERO SECTION */}
+      <section className="relative pt-6 md:pt-12 overflow-hidden">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid lg:grid-cols-12 gap-8 items-center">
+            {/* Left Content */}
+            <div className="lg:col-span-7 space-y-6">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-bold tracking-wide">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Zero Commission • 100% Student Verified</span>
+              </div>
+
+              {/* Title */}
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.12]">
+                Borrow, Lend & Exchange{" "}
+                <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 bg-clip-text text-transparent">
+                  Campus Gear.
+                </span>
               </h1>
-              <p className="text-[#64748b] dark:text-[#a1a1aa] mt-4 text-base md:text-lg">
-                UniBorrow helps students rent items fast, negotiate in-app,
-                and meet safely using verified pickup zones.
+
+              {/* Description */}
+              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed">
+                Connect directly with classmates to rent textbooks, electronics, lab supplies, and hostel essentials. Coordinate in-app and pick up safely on campus.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                <button
-                  type="button"
-                  onClick={() => navigate("/browse")}
-                  className="bg-[#f97316] hover:bg-[#ea6c0a] text-white font-semibold rounded-xl px-6 py-3 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25"
+              {/* Instant Search Bar with Live Autocomplete */}
+              <div ref={heroSearchRef} className="relative max-w-xl">
+                <form
+                  onSubmit={handleHeroSearch}
+                  className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 p-2 rounded-2xl shadow-xl shadow-slate-900/5 dark:shadow-black/20 flex flex-col sm:flex-row gap-2 ring-1 ring-black/5"
                 >
-                  Browse Items
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate("/add-item")}
-                  className="bg-white dark:bg-[#1f1f22] hover:bg-gray-50 dark:hover:bg-[#27272a] text-[#0f172a] dark:text-white font-semibold rounded-xl px-6 py-3 transition-all duration-200 border border-gray-200 dark:border-[#3f3f46] shadow-sm hover:shadow-md hover:-translate-y-0.5"
-                >
-                  List an Item
-                </button>
+                  <div className="flex-1 flex items-center px-3 gap-2">
+                    <Search className="w-4 h-4 text-slate-400 shrink-0" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onFocus={() => {
+                        if (autocompleteResults.length > 0) setAutocompleteOpen(true);
+                      }}
+                      placeholder="Search cameras, textbooks, calculators..."
+                      className="w-full bg-transparent text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none font-medium"
+                    />
+                  </div>
+                  <div className="sm:border-l border-slate-200 dark:border-slate-800 px-2 flex items-center">
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="bg-transparent text-xs text-slate-700 dark:text-slate-300 outline-none py-1.5 pr-2 font-medium cursor-pointer"
+                    >
+                      <option value="" className="bg-white dark:bg-[#111827]">All Categories</option>
+                      {categories.map((c) => (
+                        <option value={c.name} key={c.name} className="bg-white dark:bg-[#111827]">
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <button
+                    type="submit"
+                    className="bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-md shadow-orange-500/20 hover:shadow-orange-500/35 transition-all shrink-0 cursor-pointer"
+                  >
+                    Find Gear
+                  </button>
+                </form>
+
+                {/* Autocomplete Popup */}
+                {autocompleteOpen && autocompleteResults.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#111827] border border-slate-200/90 dark:border-slate-800/90 rounded-2xl shadow-2xl p-2 z-50 divide-y divide-slate-100 dark:divide-slate-800/60 animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 px-3 py-1.5 flex items-center justify-between">
+                      <span>Quick Matches</span>
+                      <span>1-Click View</span>
+                    </div>
+                    <div className="space-y-1 pt-1">
+                      {autocompleteResults.map((item) => (
+                        <div
+                          key={item._id}
+                          onClick={() => {
+                            setAutocompleteOpen(false);
+                            navigate(`/item/${item._id}`);
+                          }}
+                          className="flex items-center gap-3 p-2 rounded-xl hover:bg-orange-500/10 dark:hover:bg-orange-500/15 cursor-pointer transition-colors group"
+                        >
+                          <img
+                            src={item.images?.[0] || "/default-item.svg"}
+                            alt={item.title}
+                            className="w-10 h-10 rounded-lg object-cover border border-slate-200 dark:border-slate-700 shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-orange-500 transition-colors">
+                              {item.title}
+                            </h5>
+                            <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400">
+                              <span className="font-bold text-orange-600 dark:text-orange-400">
+                                {item.listingType === "Rent" ? `₹${item.price}/day` : "Free Exchange"}
+                              </span>
+                              {item.pickupLocation && (
+                                <span>• 📍 {item.pickupLocation}</span>
+                              )}
+                            </div>
+                          </div>
+                          <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-orange-500 transition-transform group-hover:translate-x-0.5" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Popular category tags */}
+              <div className="flex items-center gap-2 flex-wrap text-xs text-slate-500 dark:text-slate-400 pt-1">
+                <span className="font-semibold text-slate-700 dark:text-slate-300">Trending:</span>
+                {["Electronics", "Books", "Lab Equipment", "Bikes"].map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => navigate(`/browse?category=${encodeURIComponent(t)}`)}
+                    className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium transition-colors"
+                  >
+                    {t}
+                  </button>
+                ))}
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              {loading ? (
-                Array.from({ length: 2 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-28 rounded-2xl bg-white/60 border border-white/40 animate-pulse"
-                  />
-                ))
-              ) : (
-                <>
-                  <div className="rounded-2xl bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] p-6 flex flex-col justify-center">
-                    <div className="text-sm font-semibold text-[#64748b] dark:text-[#a1a1aa]">
-                      Active Campus Listings
+            {/* Right Showcase Card */}
+            <div className="lg:col-span-5 relative">
+              <div className="relative mx-auto max-w-sm sm:max-w-md">
+                {/* Decorative glow */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-orange-500/20 to-amber-500/20 rounded-3xl blur-2xl -z-10" />
+
+                {/* Primary Preview Card */}
+                <div className="bg-white dark:bg-[#111827] border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 shadow-2xl shadow-slate-900/10 dark:shadow-black/40 space-y-4">
+                  <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800">
+                    <img
+                      src={
+                        featured[0]?.images?.[0] ||
+                        "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&auto=format&fit=crop&q=80"
+                      }
+                      alt="Featured Item"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-3 left-3 flex gap-2">
+                      <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-orange-600 dark:text-orange-400 border border-orange-500/20 shadow-sm">
+                        Available Today
+                      </span>
                     </div>
-                    <div className="text-4xl font-extrabold text-[#0f172a] dark:text-white mt-2">
-                      <AnimatedCounter value={stats.itemsListed} />
+                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between px-3 py-1.5 rounded-xl bg-black/60 backdrop-blur-md text-white text-xs">
+                      <span className="flex items-center gap-1 font-medium">
+                        <MapPin className="w-3.5 h-3.5 text-orange-400" />
+                        <span>Central Library Zone</span>
+                      </span>
+                      <span className="font-bold text-amber-300">
+                        {featured[0]?.price ? `₹${featured[0].price}/day` : "₹40/day"}
+                      </span>
                     </div>
                   </div>
-                  <div className="rounded-2xl bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] p-6 flex flex-col justify-center">
-                    <div className="text-sm font-semibold text-[#64748b] dark:text-[#a1a1aa]">
-                      Active Borrows
+
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-orange-600 dark:text-orange-400">
+                        {featured[0]?.category || "Campus Essentials"}
+                      </span>
+                      <span className="text-slate-400 dark:text-slate-500">
+                        Verified Student Listing
+                      </span>
                     </div>
-                    <div className="text-4xl font-extrabold text-[#f97316] mt-2">
-                      <AnimatedCounter value={stats.activeBorrows} />
+                    <h3 className="font-bold text-slate-900 dark:text-white text-lg leading-snug line-clamp-1">
+                      {featured[0]?.title || "Graphing Calculator & Lab Kit"}
+                    </h3>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-orange-400 to-amber-500 flex items-center justify-center text-white text-xs font-bold">
+                        U
+                      </div>
+                      <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                        Student Host
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        featured[0]?._id
+                          ? navigate(`/item/${featured[0]._id}`)
+                          : navigate("/browse")
+                      }
+                      className="text-xs font-bold text-orange-600 dark:text-orange-400 hover:text-orange-700 flex items-center gap-1"
+                    >
+                      <span>View Details</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Floating Metric Pill 1 */}
+                <div className="absolute -bottom-5 -left-4 sm:-left-6 bg-white/95 dark:bg-[#1e293b]/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-700/80 rounded-2xl px-3.5 py-2.5 shadow-xl flex items-center gap-3 animate-bounce [animation-duration:4s]">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                    <CheckCircle2 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+                      Avg. Savings
+                    </div>
+                    <div className="text-xs font-extrabold text-slate-900 dark:text-white">
+                      ₹1,250 / semester
                     </div>
                   </div>
-                </>
-              )}
+                </div>
+
+                {/* Floating Metric Pill 2 */}
+                <div className="absolute -top-4 -right-3 sm:-right-5 bg-white/95 dark:bg-[#1e293b]/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-700/80 rounded-2xl px-3.5 py-2 shadow-xl flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    Hostel-B Pickup Active
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
-        {error && (
-          <div className="mt-4 text-sm text-[#ef4444] font-semibold">
-            {error}
-          </div>
-        )}
       </section>
 
-      <section className="w-full overflow-hidden bg-white/50 dark:bg-[#18181b]/50 border-y border-white/60 dark:border-[#27272a] py-8 my-6 relative">
-        <div className="absolute top-0 left-0 w-40 h-full bg-gradient-to-r from-[#f8fafc] dark:from-[#121212] to-transparent z-10 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-40 h-full bg-gradient-to-l from-[#f8fafc] dark:from-[#121212] to-transparent z-10 pointer-events-none" />
-        
-        <div className="animate-marquee gap-10 items-center px-4">
-          {[...categories, ...categories, ...categories, ...categories].map((c, idx) => (
+      {/* 📊 CAMPUS PULSE STATS */}
+      <section className="max-w-6xl mx-auto px-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+            <div className="w-9 h-9 rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-3">
+              <TrendingUp className="w-4 h-4" />
+            </div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+              <AnimatedCounter value={stats.itemsListed} />
+            </div>
+            <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">
+              Active Campus Listings
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-3">
+              <Repeat className="w-4 h-4" />
+            </div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-orange-500">
+              <AnimatedCounter value={stats.activeBorrows} />
+            </div>
+            <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">
+              Active Rentals & Exchanges
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+            <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3">
+              <Users className="w-4 h-4" />
+            </div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+              <AnimatedCounter value={stats.verifiedUsers} />
+            </div>
+            <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">
+              Verified Student Peers
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">
+              100%
+            </div>
+            <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">
+              Safe Campus Pickups
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 🗺️ CAMPUS HUBS INTERACTIVE MAP SHOWCASE */}
+      <section className="max-w-6xl mx-auto px-4">
+        <div className="bg-gradient-to-r from-orange-950/40 via-slate-900 to-slate-900 border border-orange-500/30 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden">
+          <div className="space-y-2 relative z-10 max-w-xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-orange-500/15 text-orange-400 border border-orange-500/30">
+              <Compass className="w-3.5 h-3.5 animate-spin" />
+              <span>Campus Pickup Hub Network</span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-black text-white">
+              7 Verified Meeting Hubs Across Campus
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Never meet outside your campus comfort zone. Hand off textbooks, lab equipment, and electronics at monitored zones like the Central Library, Canteen Plaza, and Academic Blocks.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto relative z-10 shrink-0">
             <button
-              key={`${c}-${idx}`}
-              onClick={() => navigate(`/browse?category=${encodeURIComponent(c)}`)}
-              className="whitespace-nowrap flex items-center gap-2 text-2xl font-black text-[#0f172a]/30 dark:text-[#a1a1aa]/30 hover:text-[#f97316] dark:hover:text-[#f97316] transition-colors uppercase tracking-[0.2em] cursor-pointer"
+              type="button"
+              onClick={() => setMapModalOpen(true)}
+              className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-xs shadow-lg shadow-orange-500/30 transition-all cursor-pointer"
             >
-              <span className="text-[#f97316]/50 mx-4 text-3xl">•</span> {c}
+              <Compass className="w-4 h-4" />
+              <span>Explore Interactive Campus Map</span>
             </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="max-w-6xl mx-auto px-4 pb-12">
-        <div className="rounded-3xl bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#27272a] p-8 md:p-10 shadow-sm">
-          <h2 className="text-2xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5] text-center mb-8">
-            How it works
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8 text-center">
-            <div className="flex flex-col items-center gap-4 group">
-              <div className="w-16 h-16 rounded-2xl bg-[#ea6c0a]/10 dark:bg-[#ea6c0a]/10 text-[#ea6c0a] flex justify-center items-center font-black text-2xl transition-transform group-hover:scale-110 group-hover:-rotate-6">
-                1
-              </div>
-              <div>
-                <div className="font-bold text-lg text-[#0f172a] dark:text-[#f4f4f5]">Find items</div>
-                <div className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-2 leading-relaxed px-4">
-                  Explore campus inventory. Locate textbooks or tech gear specific to your courses.
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex flex-col items-center gap-4 group">
-              <div className="w-16 h-16 rounded-2xl bg-[#ea6c0a]/10 dark:bg-[#ea6c0a]/10 text-[#ea6c0a] flex justify-center items-center font-black text-2xl transition-transform group-hover:scale-110 group-hover:rotate-6">
-                2
-              </div>
-              <div>
-                <div className="font-bold text-lg text-[#0f172a] dark:text-[#f4f4f5]">Chat & Meet</div>
-                <div className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-2 leading-relaxed px-4">
-                  Instantly ping the owner. Arrange safe, verified meetups right on campus ground.
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center gap-4 group">
-              <div className="w-16 h-16 rounded-2xl bg-[#ea6c0a]/10 dark:bg-[#ea6c0a]/10 text-[#ea6c0a] flex justify-center items-center font-black text-2xl transition-transform group-hover:scale-110 group-hover:rotate-3">
-                3
-              </div>
-              <div>
-                <div className="font-bold text-lg text-[#0f172a] dark:text-[#f4f4f5]">Return & Rate</div>
-                <div className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-2 leading-relaxed px-4">
-                  Hand it back and leave a verified trust review for the community.
-                </div>
-              </div>
-            </div>
+            <button
+              type="button"
+              onClick={() => navigate("/browse")}
+              className="px-5 py-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 transition-colors text-center cursor-pointer"
+            >
+              Browse All Listings
+            </button>
           </div>
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 pb-10">
-        <h2 className="text-2xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">{featuredTitle}</h2>
+      {/* 🏷️ CATEGORY GRID */}
+      <section className="max-w-6xl mx-auto px-4">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+              Explore by Category
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Find exactly what you need for this semester
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate("/browse")}
+            className="text-xs font-bold text-orange-600 dark:text-orange-400 hover:underline flex items-center gap-1"
+          >
+            <span>View All</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+          {categories.map((c) => {
+            const Icon = c.icon;
+            return (
+              <button
+                key={c.name}
+                type="button"
+                onClick={() => navigate(`/browse?category=${encodeURIComponent(c.name)}`)}
+                className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 hover:border-orange-500/50 dark:hover:border-orange-500/50 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 group transition-all duration-200 hover:-translate-y-1 hover:shadow-md cursor-pointer"
+              >
+                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-orange-500 group-hover:text-white flex items-center justify-center transition-colors">
+                  <Icon className="w-5 h-5" />
+                </div>
+                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 text-center leading-tight">
+                  {c.name}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 💎 FEATURED ITEMS */}
+      <section className="max-w-6xl mx-auto px-4">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+              {featuredTitle}
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Freshly listed items ready for pickup
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate("/browse")}
+            className="text-xs font-bold text-orange-600 dark:text-orange-400 hover:underline flex items-center gap-1"
+          >
+            <span>See more items</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
 
         {loading ? (
-          <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="w-full rounded-3xl bg-white dark:bg-[#18181b] border border-gray-200 dark:border-[#27272a] animate-pulse h-[340px]"
+                className="rounded-3xl bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 animate-pulse h-80"
               />
             ))}
           </div>
         ) : featured.length === 0 ? (
-          <div className="mt-6 bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl p-6 text-[#64748b]">
-            No featured items available right now.
+          <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-3xl p-8 text-center text-slate-500 text-sm">
+            No featured items available right now. Be the first to list!
           </div>
         ) : (
-          <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {featured.map((it) => (
-              <button
+              <div
                 key={it._id}
-                type="button"
-                className="w-full flex flex-col text-left rounded-3xl bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-gray-200 dark:border-[#27272a] p-5 shadow-sm hover:-translate-y-1 hover:shadow-xl hover:border-[#f97316]/50 dark:hover:border-[#f97316]/50 transition-all duration-300 relative group"
                 onClick={() => navigate(`/item/${it._id}`)}
+                className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 hover:border-orange-500/40 dark:hover:border-orange-500/40 rounded-3xl p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col group"
               >
-                <div className="w-full rounded-2xl overflow-hidden bg-white/60 dark:bg-[#1f1f22]/60 border border-gray-200 dark:border-[#3f3f46] relative aspect-[4/3]">
+                {/* Image */}
+                <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
                   {it.images?.[0] ? (
                     <img
                       src={it.images[0]}
                       alt={it.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] font-semibold">
+                    <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs font-medium">
                       No image
                     </div>
                   )}
+
+                  {/* Top Badges */}
+                  <div className="absolute top-2.5 left-2.5 flex gap-1.5 flex-wrap">
+                    <span
+                      className={
+                        "px-2.5 py-0.5 rounded-full text-[10px] font-bold shadow-sm " +
+                        (it.listingType === "Rent"
+                          ? "bg-orange-500 text-white"
+                          : "bg-emerald-600 text-white")
+                      }
+                    >
+                      {it.listingType === "Rent" ? "Rent" : "Exchange"}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-black/60 backdrop-blur-md text-white">
+                      {it.condition}
+                    </span>
+                  </div>
+
+                  {/* Pickup badge */}
+                  {it.pickupLocation && (
+                    <div className="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-white text-[10px]">
+                      <MapPin className="w-3 h-3 text-orange-400" />
+                      <span>{it.pickupLocation}</span>
+                    </div>
+                  )}
                 </div>
-                <div className="mt-3 font-extrabold text-[#0f172a] dark:text-[#f4f4f5] leading-tight">
-                  {it.title}
+
+                {/* Details */}
+                <div className="mt-3.5 space-y-1.5 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="text-[11px] font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wider">
+                      {it.category}
+                    </div>
+                    <h3 className="font-bold text-slate-900 dark:text-white text-base leading-snug line-clamp-1 group-hover:text-orange-500 transition-colors">
+                      {it.title}
+                    </h3>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <div>
+                      {it.listingType === "Exchange" || Number(it.price) === 0 ? (
+                        <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                          Free Exchange
+                        </span>
+                      ) : (
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-lg font-extrabold text-slate-900 dark:text-white">
+                            ₹{it.price}
+                          </span>
+                          <span className="text-[11px] text-slate-400">/ day</span>
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-xs font-semibold text-orange-600 dark:text-orange-400 group-hover:translate-x-0.5 transition-transform">
+                      Rent Now →
+                    </span>
+                  </div>
                 </div>
-                <div className="mt-2 text-sm text-[#64748b] dark:text-[#a1a1aa]">
-                  {it.listingType === "Exchange"
-                    ? "Free Exchange"
-                    : `₹${it.price}/day`}
-                </div>
-              </button>
+              </div>
             ))}
           </div>
         )}
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 pb-10">
-        <div className="rounded-2xl bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#27272a] p-6 shadow-md">
-          <h2 className="text-xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">Trust & safety</h2>
-          <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="rounded-2xl bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] p-4">
-              <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
-                Verified Users
+      {/* 🧭 HOW IT WORKS */}
+      <section className="max-w-6xl mx-auto px-4">
+        <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-8 sm:p-12 shadow-sm">
+          <div className="text-center max-w-xl mx-auto mb-10 space-y-2">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+              How UniBorrow Works
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+              Campus borrowing made seamless, verified, and secure in three simple steps.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 relative">
+            {/* Step 1 */}
+            <div className="relative flex flex-col items-center text-center space-y-3 p-4">
+              <div className="w-14 h-14 rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center font-extrabold text-xl shadow-inner">
+                <Search className="w-6 h-6" />
               </div>
-              <div className="text-2xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5] mt-1">
-                {loading ? "—" : stats.verifiedUsers.toLocaleString()}
-              </div>
-              <div className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">Rated for trust by students</div>
+              <span className="text-xs font-bold text-orange-500 uppercase tracking-widest">
+                Step 1
+              </span>
+              <h3 className="font-bold text-slate-900 dark:text-white text-base">
+                Find Your Gear
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Filter by course textbooks, lab devices, or electronics listed by verified students right on your campus.
+              </p>
             </div>
-            <div className="rounded-2xl bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] p-4">
-              <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
-                In-App Chat
+
+            {/* Step 2 */}
+            <div className="relative flex flex-col items-center text-center space-y-3 p-4">
+              <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center font-extrabold text-xl shadow-inner">
+                <MessageSquare className="w-6 h-6" />
               </div>
-              <div className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">
-                Negotiate and coordinate with item context.
-              </div>
+              <span className="text-xs font-bold text-amber-500 uppercase tracking-widest">
+                Step 2
+              </span>
+              <h3 className="font-bold text-slate-900 dark:text-white text-base">
+                Chat & Meet Safely
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Send a booking request and message the owner in real time. Choose a campus pickup zone like the Library or Canteen.
+              </p>
             </div>
-            <div className="rounded-2xl bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] p-4">
-              <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
-                Safe Meetups
+
+            {/* Step 3 */}
+            <div className="relative flex flex-col items-center text-center space-y-3 p-4">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-extrabold text-xl shadow-inner">
+                <ShieldCheck className="w-6 h-6" />
               </div>
-              <div className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">
-                Pickup zones are predefined campus spots.
-              </div>
-            </div>
-            <div className="rounded-2xl bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] p-4">
-              <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
-                Ratings
-              </div>
-              <div className="text-sm text-[#64748b] dark:text-[#a1a1aa] mt-1">
-                Multi-criteria reviews to reduce surprises.
-              </div>
+              <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest">
+                Step 3
+              </span>
+              <h3 className="font-bold text-slate-900 dark:text-white text-base">
+                Return & Build Trust
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Hand the item back on time. Rate the condition, communication, and punctuality to grow community trust.
+              </p>
             </div>
           </div>
         </div>
       </section>
+
+      {/* 🛡️ TRUST & SAFETY PILLARS */}
+      <section className="max-w-6xl mx-auto px-4">
+        <div className="border border-slate-200/80 dark:border-slate-800 bg-gradient-to-br from-orange-500/5 via-transparent to-amber-500/5 rounded-3xl p-8 sm:p-10">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400">
+                Community Standards
+              </span>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
+                Designed Exclusively for Campus Safety
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate("/signup")}
+              className="px-5 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-bold text-xs hover:opacity-90 transition-opacity"
+            >
+              Join UniBorrow
+            </button>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl shadow-sm space-y-2">
+              <div className="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center font-bold text-sm">
+                ID
+              </div>
+              <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                Student Verification
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Only verified university members with institutional credentials can request or list items.
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl shadow-sm space-y-2">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm">
+                💬
+              </div>
+              <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                Contextual Chat
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Discuss pickup times, item inspection, and usage rules directly within the item conversation.
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl shadow-sm space-y-2">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-sm">
+                📍
+              </div>
+              <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                Predefined Zones
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                All handoffs occur at well-lit, high-visibility campus locations (Library, Main Gate, Academic Block).
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl shadow-sm space-y-2">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-sm">
+                ⭐
+              </div>
+              <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                Multi-Factor Reviews
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Rate item accuracy, communication, and return timeliness to safeguard community reputation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 🗺️ Interactive Campus Map Modal */}
+      <CampusMapModal
+        isOpen={mapModalOpen}
+        onClose={() => setMapModalOpen(false)}
+        onSelectHub={(hubId) => {
+          navigate(hubId ? `/browse?pickupLocation=${encodeURIComponent(hubId)}` : "/browse");
+        }}
+      />
     </div>
   );
 };

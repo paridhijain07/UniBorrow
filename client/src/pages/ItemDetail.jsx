@@ -12,6 +12,7 @@ import BookingModal from "../components/uniborrow/BookingModal.jsx";
 import ReviewForm from "../components/uniborrow/ReviewForm.jsx";
 import ReviewCard from "../components/uniborrow/ReviewCard.jsx";
 import { getItemBookings } from "../api/bookings.api";
+import { MapPin, Clock, MessageSquare, ShieldCheck, ArrowLeft, Star, Sparkles } from "lucide-react";
 
 const ItemDetail = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const ItemDetail = () => {
   const { create: createBooking, pending: bookingPending, error: bookingError } =
     useCreateBooking();
 
-  const { data: myRequests, loading: myRequestsLoading, error: myRequestsError, refetch: refetchMyRequests } =
+  const { data: myRequests, loading: _myRequestsLoading, refetch: refetchMyRequests } =
     useMyRequests();
 
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -144,7 +145,7 @@ const bookedRanges = useMemo(() => {
       toast.error("Owner not found.");
       return;
     }
-    navigate(`/chat/${ownerId}`);
+    navigate(`/chat/${ownerId}?itemId=${id}`);
   };
 
   const handleConfirmBooking = async ({ startDate, endDate }) => {
@@ -163,14 +164,14 @@ const bookedRanges = useMemo(() => {
 
   if (itemLoading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-10">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-2 gap-8">
-          <div className="rounded-2xl bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] h-[420px] animate-pulse" />
+          <div className="rounded-3xl bg-slate-200/70 dark:bg-slate-800/60 h-[460px] animate-pulse" />
           <div className="space-y-4">
-            <div className="h-10 bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] rounded-2xl animate-pulse" />
-            <div className="h-6 bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] rounded-2xl animate-pulse" />
-            <div className="h-6 bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] rounded-2xl animate-pulse" />
-            <div className="h-12 bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] rounded-2xl animate-pulse" />
+            <div className="h-10 bg-slate-200/70 dark:bg-slate-800/60 rounded-2xl animate-pulse" />
+            <div className="h-6 bg-slate-200/70 dark:bg-slate-800/60 rounded-xl animate-pulse" />
+            <div className="h-28 bg-slate-200/70 dark:bg-slate-800/60 rounded-3xl animate-pulse" />
+            <div className="h-14 bg-slate-200/70 dark:bg-slate-800/60 rounded-2xl animate-pulse" />
           </div>
         </div>
       </div>
@@ -179,22 +180,41 @@ const bookedRanges = useMemo(() => {
 
   if (itemError || !item) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-10">
-        <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl p-6 text-[#ef4444] font-semibold">
-          {itemError || "Item not found"}
+      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+        <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-10 shadow-sm">
+          <div className="text-4xl mb-3">🔍</div>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Listing Not Found</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+            {itemError || "The item you're looking for may have been removed or returned to its owner."}
+          </p>
+          <button
+            onClick={() => navigate("/browse")}
+            className="mt-6 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white font-bold rounded-xl shadow-md shadow-orange-500/20 hover:shadow-orange-500/35 transition-all text-sm"
+          >
+            Back to Browse
+          </button>
         </div>
       </div>
     );
   }
 
-  const currentItem = item.item || item; // support either shape.
+  const currentItem = item.item || item;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
+      {/* BACK NAVIGATION */}
+      <button
+        onClick={() => navigate(-1)}
+        className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-orange-500 transition-colors"
+      >
+        <ArrowLeft size={16} /> Back to results
+      </button>
+
       <div className="grid lg:grid-cols-2 gap-8 items-start">
-        <div className="space-y-4">
-          <div className="rounded-2xl bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] shadow-md p-3">
-            <div className="aspect-square rounded-2xl overflow-hidden bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46]">
+        {/* LEFT COLUMN: IMAGES & AVAILABILITY */}
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-4 shadow-sm">
+            <div className="aspect-square rounded-2xl overflow-hidden bg-slate-100 dark:bg-[#1a2234] border border-slate-200/60 dark:border-slate-800/60 relative">
               {images?.[activeImgIdx] ? (
                 <img
                   src={images[activeImgIdx]}
@@ -202,13 +222,23 @@ const bookedRanges = useMemo(() => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] font-semibold">
-                  No image
+                <div className="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500 font-medium">
+                  No image available
                 </div>
               )}
+              <span
+                className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-black shadow-md uppercase tracking-wider ${
+                  currentItem?.listingType === "Rent"
+                    ? "bg-gradient-to-r from-orange-500 to-amber-600 text-white shadow-orange-500/25"
+                    : "bg-emerald-500 text-white shadow-emerald-500/25"
+                }`}
+              >
+                {currentItem?.listingType === "Rent" ? "For Rent" : "Free Exchange"}
+              </span>
             </div>
+
             {images?.length > 1 && (
-              <div className="mt-3 flex gap-2 overflow-auto">
+              <div className="mt-3 flex gap-2.5 overflow-auto pb-1">
                 {images.map((src, idx) => {
                   const active = idx === activeImgIdx;
                   return (
@@ -217,8 +247,10 @@ const bookedRanges = useMemo(() => {
                       key={`${src}-${idx}`}
                       onClick={() => setActiveImgIdx(idx)}
                       className={
-                        "w-16 h-16 rounded-xl overflow-hidden border transition-all duration-200 " +
-                        (active ? "border-[#f97316]" : "border-white/40 dark:border-[#3f3f46]")
+                        "w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 shrink-0 " +
+                        (active
+                          ? "border-orange-500 ring-2 ring-orange-500/20 scale-105"
+                          : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700")
                       }
                     >
                       <img
@@ -236,77 +268,78 @@ const bookedRanges = useMemo(() => {
           <AvailabilityCalendar bookedRanges={bookedRanges} />
         </div>
 
-        <div className="space-y-5">
-          <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6">
-            <div className="flex flex-col gap-3">
-              <h1 className="text-3xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5] leading-tight">
+        {/* RIGHT COLUMN: DETAILS, PRICING, OWNER, REVIEWS */}
+        <div className="space-y-6">
+          {/* MAIN INFO CARD */}
+          <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-6 md:p-8 shadow-sm">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700">
+                  {currentItem?.category}
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200/80 dark:border-slate-700">
+                  Condition: {currentItem?.condition}
+                </span>
+              </div>
+
+              <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white leading-tight">
                 {currentItem?.title}
               </h1>
-              <div className="flex flex-wrap gap-2">
-                <span
-                  className={
-                    "px-3 py-1 rounded-full text-xs font-semibold border " +
-                    (currentItem?.listingType === "Rent"
-                      ? "bg-orange-100 text-orange-700 border-orange-200"
-                      : "bg-green-100 text-green-700 border-green-200")
-                  }
-                >
-                  {currentItem?.listingType === "Rent"
-                    ? "Rent"
-                    : "Exchange"}
+
+              {/* PRICING BLOCK */}
+              <div className="bg-slate-50 dark:bg-[#1a2234] border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4 flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Rental Price
+                  </div>
+                  <div className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mt-0.5">
+                    {currentItem?.listingType === "Exchange" || currentItem?.price === 0 ? (
+                      <span className="text-emerald-600 dark:text-emerald-400">Free Exchange</span>
+                    ) : (
+                      <span>
+                        ₹{currentItem?.price}
+                        <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">/day</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {currentItem?.originalPrice > 0 && currentItem?.price > 0 && (
+                  <div className="text-right">
+                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Original Retail</div>
+                    <div className="text-sm font-bold text-slate-400 line-through">
+                      ₹{currentItem.originalPrice}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400 pt-1">
+                <span className="flex items-center gap-1.5">
+                  <MapPin size={15} className="text-orange-500" />
+                  Pickup: <strong className="text-slate-800 dark:text-slate-200">{currentItem?.pickupLocation}</strong>
                 </span>
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] border border-white/40 dark:border-[#3f3f46]">
-                  {currentItem?.condition}
+                <span className="flex items-center gap-1.5">
+                  <Clock size={15} />
+                  {listedAgeText}
                 </span>
               </div>
 
-              <div>
-                <div className="text-sm text-[#64748b] dark:text-[#a1a1aa]">Price</div>
-                <div className="text-2xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5] mt-1">
-                  {currentItem?.listingType === "Exchange" || currentItem?.price === 0 ? (
-                    <span>Free Exchange</span>
-                  ) : (
-                    <span>
-                      ₹{currentItem?.price}/day
-                      {currentItem?.originalPrice &&
-                        currentItem.originalPrice > 0 && (
-                          <span className="ml-3 text-sm text-[#64748b] dark:text-[#a1a1aa] line-through font-semibold">
-                            ₹{currentItem.originalPrice}
-                          </span>
-                        )}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="text-sm text-[#64748b] dark:text-[#a1a1aa] font-semibold">
-                {listedAgeText}
-              </div>
-
-              <div className="mt-3">
-                <div className="text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
-                  Pickup location
-                </div>
-                <div className="mt-2">
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] border border-white/40 dark:border-[#3f3f46]">
-                    {currentItem?.pickupLocation}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3 mt-5">
+              {/* CTA BUTTONS */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/60">
                 <button
                   type="button"
                   onClick={openRequest}
-                  className="bg-[#f97316] hover:bg-[#ea6c0a] text-white font-semibold rounded-xl px-6 py-3 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25"
+                  className="flex-1 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold rounded-xl px-6 py-3.5 transition-all duration-200 shadow-md shadow-orange-500/25 hover:shadow-orange-500/40 text-center"
                 >
                   Request to Borrow
                 </button>
                 <button
                   type="button"
                   onClick={openChat}
-                  className="bg-white/80 dark:bg-[#18181b]/80 hover:bg-white text-[#0f172a] dark:text-[#f4f4f5] font-semibold rounded-xl px-6 py-3 transition-all duration-200 border border-white/40 dark:border-[#3f3f46]"
+                  className="flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-800 dark:text-slate-200 font-bold rounded-xl px-6 py-3.5 transition-all duration-200 border border-slate-200 dark:border-slate-700"
                 >
+                  <MessageSquare size={16} />
                   Message Owner
                 </button>
               </div>
@@ -325,80 +358,96 @@ const bookedRanges = useMemo(() => {
             </div>
           </div>
 
-          <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6">
-            <h2 className="text-xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">Description</h2>
-            <p className="mt-3 text-sm text-[#0f172a] dark:text-[#f4f4f5] leading-relaxed">
+          {/* DESCRIPTION */}
+          <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Item Description</h2>
+            <p className="mt-3 text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">
               {currentItem?.description}
             </p>
             {Array.isArray(currentItem?.tags) && currentItem.tags.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-1.5 pt-3 border-t border-slate-100 dark:border-slate-800/60">
                 {currentItem.tags.map((t) => (
                   <span
                     key={t}
-                    className="px-3 py-1 rounded-full text-xs font-semibold bg-white/60 dark:bg-[#1f1f22]/60 text-[#0f172a] dark:text-[#f4f4f5] border border-white/40 dark:border-[#3f3f46]"
+                    className="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
                   >
-                    {t}
+                    #{t}
                   </span>
                 ))}
               </div>
             )}
           </div>
 
-          <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6">
-            <h2 className="text-xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">Owner</h2>
-            <div className="mt-4 flex items-center gap-4">
+          {/* OWNER CARD */}
+          <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Owner Information</h2>
+              <button
+                onClick={() => ownerId && navigate(`/profile/${ownerId}`)}
+                className="text-xs font-bold text-orange-500 hover:text-orange-600 transition-colors"
+              >
+                View Profile →
+              </button>
+            </div>
+            <div className="flex items-center gap-4">
               <img
-                src={
-                  item?.owner?.avatar || "/default-avatar.svg"
-                }
+                src={item?.owner?.avatar || "/default-avatar.svg"}
                 alt={ownerName || "Owner"}
-                className="w-16 h-16 rounded-full object-cover border border-white/40 dark:border-[#3f3f46]"
+                className="w-14 h-14 rounded-full object-cover border-2 border-slate-200 dark:border-slate-800 shrink-0"
               />
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <div className="font-extrabold text-[#0f172a] dark:text-[#f4f4f5] text-lg">
-                    {ownerName || "Unknown"}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="font-bold text-slate-900 dark:text-white text-base truncate">
+                    {ownerName || "Campus Peer"}
                   </div>
                   {item?.owner?.verifiedBadge && (
-                    <span className="text-xs font-extrabold bg-orange-100 text-orange-700 px-3 py-1 rounded-full border border-orange-200">
-                      Verified
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-900">
+                      <ShieldCheck size={12} /> Verified
                     </span>
                   )}
                 </div>
 
-                <div className="mt-2 text-sm text-[#64748b] dark:text-[#a1a1aa] font-semibold">
-                  Rating: {item?.owner?.rating ? item.owner.rating.toFixed(1) : "0.0"}{" "}
-                  <span className="text-xs text-[#64748b] dark:text-[#a1a1aa]">(Trust score)</span>
-                </div>
-                <div className="mt-2 flex flex-wrap gap-2 text-sm text-[#64748b] dark:text-[#a1a1aa] font-semibold">
-                  <span>Fellows lent: {item?.owner?.totalLent || 0}</span>
-                  <span>Response: {item?.owner?.responseRate || 100}%</span>
+                <div className="mt-1 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium flex-wrap">
+                  <span className="flex items-center gap-1">
+                    <Star size={13} className="text-amber-500 fill-amber-500" />
+                    {item?.owner?.rating ? item.owner.rating.toFixed(1) : "5.0"} Trust Score
+                  </span>
+                  <span>•</span>
+                  <span>{item?.owner?.totalLent || 0} items lent</span>
+                  <span>•</span>
+                  <span>{item?.owner?.responseRate || 100}% response</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6">
-            <h2 className="text-xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">Reviews</h2>
+          {/* REVIEWS SECTION */}
+          <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                Student Reviews ({reviews?.length || 0})
+              </h2>
+            </div>
+
             {reviewsLoading ? (
-              <div className="mt-4 space-y-3">
-                {Array.from({ length: 3 }).map((_, i) => (
+              <div className="space-y-3">
+                {Array.from({ length: 2 }).map((_, i) => (
                   <div
                     key={i}
-                    className="h-36 rounded-2xl bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] animate-pulse"
+                    className="h-28 rounded-2xl bg-slate-100 dark:bg-slate-800/60 animate-pulse"
                   />
                 ))}
               </div>
             ) : reviewsError ? (
-              <div className="mt-4 text-sm text-[#ef4444] font-semibold">
+              <div className="text-sm text-rose-500 font-medium">
                 {reviewsError}
               </div>
             ) : reviews?.length === 0 ? (
-              <div className="mt-4 text-sm text-[#64748b] dark:text-[#a1a1aa] font-semibold">
-                No reviews yet. Be the first after a successful return.
+              <div className="p-6 text-center text-sm text-slate-500 dark:text-slate-400">
+                No reviews yet for this listing. Be the first to share feedback after returning.
               </div>
             ) : (
-              <div className="mt-4 space-y-4">
+              <div className="space-y-3">
                 {reviews.map((r) => (
                   <ReviewCard key={r._id} review={r} />
                 ))}
@@ -406,7 +455,7 @@ const bookedRanges = useMemo(() => {
             )}
 
             {authed && reviewBooking && (
-              <div className="mt-6">
+              <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800/60">
                 <ReviewForm
                   bookingId={reviewBooking._id || reviewBooking.id}
                   onSuccess={() => {
@@ -416,57 +465,56 @@ const bookedRanges = useMemo(() => {
                 />
               </div>
             )}
-
-            {authed && !myRequestsLoading && !reviewBooking && (
-              <div className="mt-4 text-sm text-[#64748b] dark:text-[#a1a1aa] font-semibold">
-                Leave a review after returning this item.
-              </div>
-            )}
           </div>
 
-          <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] rounded-2xl shadow-md p-6">
-            <h2 className="text-xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">
-              Similar items
-            </h2>
+          {/* SIMILAR ITEMS */}
+          <div className="bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles size={18} className="text-orange-500" />
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                Similar in {currentItem?.category}
+              </h2>
+            </div>
+
             {similarLoading ? (
-              <div className="mt-4 grid sm:grid-cols-2 gap-4">
-                {Array.from({ length: 2 }).map((_, i) => (
+              <div className="grid sm:grid-cols-3 gap-3">
+                {Array.from({ length: 3 }).map((_, i) => (
                   <div
                     key={i}
-                    className="h-[220px] rounded-2xl bg-white/60 dark:bg-[#1f1f22]/60 border border-white/40 dark:border-[#3f3f46] animate-pulse"
+                    className="h-44 rounded-2xl bg-slate-100 dark:bg-slate-800/60 animate-pulse"
                   />
                 ))}
               </div>
             ) : similar.length === 0 ? (
-              <div className="mt-4 text-sm text-[#64748b] dark:text-[#a1a1aa] font-semibold">
-                No similar items found right now.
+              <div className="text-xs text-slate-500 dark:text-slate-400 py-3">
+                No other items in this category currently.
               </div>
             ) : (
-              <div className="mt-4 grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-3 gap-3">
                 {similar.map((it) => (
                   <button
                     key={it._id}
                     type="button"
-                    className="text-left rounded-2xl bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-white/40 dark:border-[#3f3f46] p-4 shadow-md hover:scale-[1.02] hover:shadow-xl hover:border-[#f97316]/50 hover:ring-2 hover:ring-[#f97316]/20 transition-all duration-200"
+                    className="text-left rounded-2xl bg-slate-50 dark:bg-[#1a2234] border border-slate-200/70 dark:border-slate-800/70 p-3 hover:border-orange-500/40 hover:-translate-y-0.5 transition-all duration-200 group"
                     onClick={() => navigate(`/item/${it._id}`)}
                   >
-                    <div className="aspect-square rounded-xl overflow-hidden border border-white/40 dark:border-[#3f3f46] bg-white/60 dark:bg-[#1f1f22]/60">
+                    <div className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-800">
                       {it.images?.[0] ? (
                         <img
                           src={it.images[0]}
                           alt={it.title}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[#64748b] dark:text-[#a1a1aa] text-sm font-semibold">
+                        <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
                           No image
                         </div>
                       )}
                     </div>
-                    <div className="mt-3 font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">
+                    <div className="mt-2.5 font-bold text-slate-900 dark:text-white text-xs truncate group-hover:text-orange-500 transition-colors">
                       {it.title}
                     </div>
-                    <div className="mt-2 text-sm text-[#64748b] dark:text-[#a1a1aa] font-semibold">
+                    <div className="mt-1 text-xs font-black text-slate-700 dark:text-slate-300">
                       {it.listingType === "Exchange" || it.price === 0
                         ? "Free Exchange"
                         : `₹${it.price}/day`}

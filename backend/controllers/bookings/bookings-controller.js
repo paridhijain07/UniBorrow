@@ -50,6 +50,31 @@ const createBooking = async (req, res, next) => {
       return res.status(404).json({ success: false, message: "Item not found" });
     }
 
+    // Prevent borrowing own item
+    if (String(item.owner) === String(borrowerId)) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot borrow your own item",
+      });
+    }
+
+    const startDt = new Date(startDate);
+    const endDt = new Date(endDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (isNaN(startDt.getTime()) || isNaN(endDt.getTime())) {
+      return res.status(400).json({ success: false, message: "Invalid dates provided" });
+    }
+
+    if (startDt.getTime() < today.getTime()) {
+      return res.status(400).json({ success: false, message: "Start date cannot be in the past" });
+    }
+
+    if (endDt.getTime() < startDt.getTime()) {
+      return res.status(400).json({ success: false, message: "End date must be on or after start date" });
+    }
+
     // Prevent overlaps with pending/approved bookings.
     const overlap = await Booking.findOne({
       item: itemId,
@@ -183,6 +208,22 @@ const approveBooking = async (req, res, next) => {
     booking.status = "approved";
     await booking.save();
 
+    // Mark item as rented
+    await Item.findByIdAndUpdate(booking.item._id || booking.item, {
+      status: "rented",
+    });
+
+    // Auto-reject conflicting pending requests for the same item during this period
+    await Booking.updateMany(
+      {
+        _id: { $ne: booking._id },
+        item: booking.item._id || booking.item,
+        status: "pending",
+        startDate: { $lte: booking.endDate },
+        endDate: { $gte: booking.startDate },
+      },
+      { $set: { status: "rejected" } }
+    );
 
     const borrower = await User.findById(booking.borrower);
     await createNotification({
@@ -217,7 +258,6 @@ const rejectBooking = async (req, res, next) => {
     booking.status = "rejected";
     await booking.save();
 
-
     await createNotification({
       userId: booking.borrower,
       type: "booking_rejected",
@@ -251,6 +291,17 @@ const returnBooking = async (req, res, next) => {
     booking.reviewLeft = false;
     await booking.save();
 
+    // Check if there are other active approved bookings; if none, return item to available
+    const activeRemaining = await Booking.findOne({
+      item: booking.item._id || booking.item,
+      status: "approved",
+      _id: { $ne: booking._id },
+    });
+    if (!activeRemaining) {
+      await Item.findByIdAndUpdate(booking.item._id || booking.item, {
+        status: "available",
+      });
+    }
 
     await User.findByIdAndUpdate(booking.owner, { $inc: { totalLent: 1 } });
     await User.findByIdAndUpdate(booking.borrower, {
@@ -270,41 +321,26 @@ const returnBooking = async (req, res, next) => {
     return next(err);
   }
 };
-// const getItemBookings = async (req, res) => {
-//   try {
-//     const { itemId } = req.params;
-
-//     const today = new Date();
-//     today.setHours(0, 0, 0, 0); // normalize
-
-//     const bookings = await Booking.find({
-//       item: itemId,
-//       status: { $in: ["pending", "approved"] }, // ✅ only active
-//       endDate: { $gte: today }, // ✅ only current/future
-//     }).select("startDate endDate status");
-
-//     res.json({ bookings });
-//   } catch (err) {
-//     res.status(500).json({ message: "Error fetching bookings" });
-//   }
-// };
 
 const getItemBookings = async (req, res) => {
   try {
     const { itemId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(itemId)) {
+      return res.status(400).json({ success: false, message: "Invalid item id" });
+    }
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     const bookings = await Booking.find({
-      item: new mongoose.Types.ObjectId(itemId), // 🔥 IMPORTANT
+      item: new mongoose.Types.ObjectId(itemId),
       status: { $in: ["pending", "approved"] },
       endDate: { $gte: today },
     }).select("startDate endDate status");
 
-    res.json({ bookings });
+    return res.json({ bookings });
   } catch (err) {
-    res.status(500).json({ message: "Error fetching bookings" });
+    return res.status(500).json({ success: false, message: "Error fetching bookings" });
   }
 };
 module.exports = {

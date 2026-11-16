@@ -67,7 +67,8 @@ const getItems = async (req, res, next) => {
     }
 
     if (search && String(search).trim()) {
-      const rx = new RegExp(String(search).trim(), "i");
+      const cleanSearch = String(search).trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const rx = new RegExp(cleanSearch, "i");
       filters.$or = [{ title: rx }, { description: rx }, { tags: rx }];
     }
 
@@ -109,6 +110,8 @@ const getItems = async (req, res, next) => {
     const query = Item.find(filters);
 
     if (sort === "price_asc") query.sort({ price: 1, createdAt: -1 });
+    else if (sort === "price_desc") query.sort({ price: -1, createdAt: -1 });
+    else if (sort === "oldest") query.sort({ createdAt: 1 });
     else query.sort({ createdAt: -1 }); // newest
 
     const items = await query.skip(skip).limit(limitNum);
@@ -208,8 +211,26 @@ const updateItem = async (req, res, next) => {
       return res.status(403).json({ success: false, message: "Forbidden" });
     }
 
-    // Full update: schema-level validation will enforce enums.
-    Object.assign(item, req.body);
+    const allowedFields = [
+      "title",
+      "description",
+      "category",
+      "condition",
+      "listingType",
+      "price",
+      "originalPrice",
+      "images",
+      "tags",
+      "pickupLocation",
+      "status",
+    ];
+
+    allowedFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        item[field] = req.body[field];
+      }
+    });
+
     const updated = await item.save();
 
     return res.json({ item: updated });

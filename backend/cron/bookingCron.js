@@ -27,23 +27,19 @@ const startCron = () => {
         if (!b.endDate) continue;
         
         const endDt = new Date(b.endDate);
-        const diffDays = Math.floor((endDt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-
-        // Reminder (exactly 1 day left)
-        if (diffDays === 0) { // e.g. tomorrow - now is ~0.xyz days
-          // Check if exactly tomorrow
-          if (endDt.toDateString() === tomorrow.toDateString()) {
-             await Notification.create({
-                user: b.borrower,
-                type: "booking_reminder",
-                message: `Reminder: Your borrowed item "${b.item?.title}" is due tomorrow!`,
-                relatedBooking: b._id,
-             });
-          }
+        // 1. One-Day Reminders (due tomorrow)
+        if (endDt.toDateString() === tomorrow.toDateString()) {
+          await Notification.create({
+            user: b.borrower,
+            type: "booking_reminder",
+            message: `Reminder: Your borrowed item "${b.item?.title || "Item"}" is due tomorrow!`,
+            relatedBooking: b._id,
+            relatedItem: b.item?._id,
+          });
         }
 
         // 2. Penalty (overdue)
-        // Check if endDate < now (ignoring time) 
+        // Check if endDate < now (ignoring time)
         if (endDt.getTime() < new Date(todayString).getTime()) {
           const lastApplied = b.lastPenaltyAppliedDate ? new Date(b.lastPenaltyAppliedDate).toDateString() : null;
 
@@ -57,8 +53,9 @@ const startCron = () => {
             await Notification.create({
               user: b.borrower,
               type: "penalty_applied",
-              message: `Overdue warning: A late penalty of ₹${PENALTY_PER_DAY} has been added for "${b.item?.title}". Please return immediately.`,
+              message: `Overdue warning: A late penalty of ₹${PENALTY_PER_DAY} has been added for "${b.item?.title || "Item"}". Please return immediately.`,
               relatedBooking: b._id,
+              relatedItem: b.item?._id,
             });
           }
         }

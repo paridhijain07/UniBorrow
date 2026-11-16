@@ -128,6 +128,8 @@ const getConversations = async (req, res, next) => {
             name: "$otherUser.name",
             avatar: "$otherUser.avatar",
             verifiedBadge: "$otherUser.verifiedBadge",
+            pickupZone: "$otherUser.pickupZone",
+            rating: "$otherUser.rating",
           },
           lastMessage: {
             _id: "$lastMessage._id",
@@ -178,7 +180,7 @@ const getThread = async (req, res, next) => {
     );
 
     const otherUser = await User.findById(userId).select(
-      "name avatar verifiedBadge"
+      "name avatar verifiedBadge pickupZone rating bio"
     );
 
     return res.json({ otherUser, messages });

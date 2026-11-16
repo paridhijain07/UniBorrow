@@ -4,12 +4,12 @@ const User = require("../../models/User");
 const Item = require("../../models/Item");
 const Review = require("../../models/Review");
 
-const getPublicUser = (userDoc) => {
+const getPublicUser = (userDoc, includeEmail = false) => {
   if (!userDoc) return null;
   return {
     id: userDoc._id,
     name: userDoc.name,
-    email: userDoc.email,
+    ...(includeEmail ? { email: userDoc.email } : {}),
     avatar: userDoc.avatar,
     bio: userDoc.bio,
     verified: userDoc.verified,
@@ -61,7 +61,7 @@ const updateMyProfile = async (req, res, next) => {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    const { name, bio, avatar, pickupZone } = req.body;
+    const { name, bio, avatar, pickupZone, verifiedBadge } = req.body;
 
     const updated = await User.findByIdAndUpdate(
       userId,
@@ -70,13 +70,14 @@ const updateMyProfile = async (req, res, next) => {
         ...(bio !== undefined ? { bio } : {}),
         ...(avatar !== undefined ? { avatar } : {}),
         ...(pickupZone !== undefined ? { pickupZone } : {}),
+        ...(verifiedBadge !== undefined ? { verifiedBadge, verified: Boolean(verifiedBadge) } : {}),
       },
       { new: true }
     ).select(
       "name email avatar bio verified verifiedBadge rating totalRatings responseRate totalLent totalBorrowed pickupZone createdAt"
     );
 
-    return res.json({ user: getPublicUser(updated) });
+    return res.json({ user: getPublicUser(updated, true) });
   } catch (err) {
     return next(err);
   }

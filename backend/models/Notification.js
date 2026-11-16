@@ -7,6 +7,8 @@ const notificationTypes = [
   "booking_returned",
   "new_message",
   "review_received",
+  "booking_reminder",
+  "penalty_applied",
 ];
 
 const NotificationSchema = new mongoose.Schema(
@@ -23,6 +25,8 @@ const NotificationSchema = new mongoose.Schema(
   },
   { timestamps: false }
 );
+
+NotificationSchema.index({ user: 1, read: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Notification", NotificationSchema);
 

@@ -62,126 +62,139 @@ const Signup = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-10 w-full">
-      <div className="bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md rounded-2xl shadow-md border border-white/40 dark:border-[#27272a] p-6">
-        <h1 className="text-2xl font-extrabold text-[#0f172a] dark:text-[#f4f4f5]">
-          Create your UniBorrow account
-        </h1>
-        <p className="text-sm text-[#64748b] mt-2">
-          Safe pickups + in-app chat for verified campus borrowing.
-        </p>
+    <div className="max-w-lg mx-auto px-4 py-12 w-full">
+      <div className="bg-white dark:bg-[#111827] rounded-3xl shadow-xl border border-slate-200/80 dark:border-slate-800/80 p-8 sm:p-9 relative overflow-hidden">
+        {/* Glow accent */}
+        <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl pointer-events-none -z-0" />
 
-        <form className="mt-6 space-y-4" onSubmit={onSubmit}>
-          <div>
-            <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
-              Name
-            </label>
-            <input
-              className="mt-1 w-full border border-white/40 dark:border-[#27272a] bg-white/60 dark:bg-[#1f1f22]/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your full name"
-            />
-            {fieldErrors.name && (
-              <div className="text-sm text-[#ef4444] mt-1">
-                {fieldErrors.name}
-              </div>
-            )}
+        <div className="relative z-10">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white text-xl font-black shadow-lg shadow-orange-500/25 mb-4">
+            U
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
-              Email
-            </label>
-            <input
-              className="mt-1 w-full border border-white/40 dark:border-[#27272a] bg-white/60 dark:bg-[#1f1f22]/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-            />
-            {fieldErrors.email && (
-              <div className="text-sm text-[#ef4444] mt-1">
-                {fieldErrors.email}
-              </div>
-            )}
-          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            Create an Account
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
+            Join your verified campus peer network on UniBorrow.
+          </p>
 
-          <div>
-            <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
-              Password
-            </label>
-            <input
-              className="mt-1 w-full border border-white/40 dark:border-[#27272a] bg-white/60 dark:bg-[#1f1f22]/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Create a password"
-              type="password"
-            />
-            {fieldErrors.password && (
-              <div className="text-sm text-[#ef4444] mt-1">
-                {fieldErrors.password}
-              </div>
-            )}
-          </div>
+          <form className="mt-6 space-y-4" onSubmit={onSubmit}>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Full Name
+              </label>
+              <input
+                className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g., Alex Johnson"
+              />
+              {fieldErrors.name && (
+                <div className="text-xs text-rose-500 font-semibold mt-1">
+                  {fieldErrors.name}
+                </div>
+              )}
+            </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
-              Confirm Password
-            </label>
-            <input
-              className="mt-1 w-full border border-white/40 dark:border-[#27272a] bg-white/60 dark:bg-[#1f1f22]/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Repeat your password"
-              type="password"
-            />
-            {fieldErrors.confirmPassword && (
-              <div className="text-sm text-[#ef4444] mt-1">
-                {fieldErrors.confirmPassword}
-              </div>
-            )}
-          </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Campus Email
+              </label>
+              <input
+                type="email"
+                className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@university.edu"
+              />
+              {fieldErrors.email && (
+                <div className="text-xs text-rose-500 font-semibold mt-1">
+                  {fieldErrors.email}
+                </div>
+              )}
+            </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-[#0f172a] dark:text-[#f4f4f5]">
-              Safe pickup zone
-            </label>
-            <select
-              className="mt-1 w-full border border-white/40 dark:border-[#27272a] bg-white/60 dark:bg-[#1f1f22]/60 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#f97316]/40"
-              value={pickupZone}
-              onChange={(e) => setPickupZone(e.target.value)}
+            <div className="grid sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                  Password
+                </label>
+                <input
+                  className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Min 6 characters"
+                  type="password"
+                />
+                {fieldErrors.password && (
+                  <div className="text-xs text-rose-500 font-semibold mt-1">
+                    {fieldErrors.password}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                  Confirm Password
+                </label>
+                <input
+                  className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repeat password"
+                  type="password"
+                />
+                {fieldErrors.confirmPassword && (
+                  <div className="text-xs text-rose-500 font-semibold mt-1">
+                    {fieldErrors.confirmPassword}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                Default Campus Pickup Zone
+              </label>
+              <select
+                className="w-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all text-sm"
+                value={pickupZone}
+                onChange={(e) => setPickupZone(e.target.value)}
+              >
+                {pickupZones.map((z) => (
+                  <option key={z} value={z} className="bg-white dark:bg-[#111827] text-slate-900 dark:text-white">
+                    {z} Safe Pickup Zone
+                  </option>
+                ))}
+              </select>
+              {fieldErrors.pickupZone && (
+                <div className="text-xs text-rose-500 font-semibold mt-1">
+                  {fieldErrors.pickupZone}
+                </div>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={pending}
+              className="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold rounded-xl px-6 py-3.5 transition-all duration-200 shadow-md shadow-orange-500/25 hover:shadow-orange-500/40 disabled:opacity-50 disabled:cursor-not-allowed text-sm mt-2"
             >
-              {pickupZones.map((z) => (
-                <option key={z} value={z}>
-                  {z}
-                </option>
-              ))}
-            </select>
-            {fieldErrors.pickupZone && (
-              <div className="text-sm text-[#ef4444] mt-1">
-                {fieldErrors.pickupZone}
-              </div>
-            )}
-          </div>
+              {pending ? "Creating Account..." : "Create Account"}
+            </button>
 
-          <button
-            type="submit"
-            disabled={pending}
-            className="w-full bg-[#f97316] hover:bg-[#ea6c0a] text-white font-semibold rounded-xl px-6 py-3 transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {pending ? "Creating..." : "Create account"}
-          </button>
-
-          <div className="text-sm text-[#64748b] text-center pt-2">
-            Already have an account?{" "}
-            <span
-              className="text-[#f97316] font-semibold cursor-pointer"
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </span>
-          </div>
-        </form>
+            <div className="text-xs text-slate-500 dark:text-slate-400 text-center pt-3 border-t border-slate-100 dark:border-slate-800/60">
+              Already have an account?{" "}
+              <button
+                type="button"
+                className="text-orange-500 hover:text-orange-600 font-bold ml-1 transition-colors"
+                onClick={() => navigate("/login")}
+              >
+                Sign In
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
